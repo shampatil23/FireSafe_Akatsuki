@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring & Alerts - AgniVeer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Left Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="brand">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    AgniVeer
+                </div>
+                <div class="sidebar-tagline">Forest Fire Intelligence Platform</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Core Features</div>
+                <a href="index.html" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="risk-analysis.html" class="sidebar-nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Risk Assessment</span>
+                </a>
+                <a href="simulation.html" class="sidebar-nav-link">
+                    <i class="fas fa-fire"></i>
+                    <span>Fire Simulation</span>
+                </a>
+                <a href="optimization.html" class="sidebar-nav-link">
+                    <i class="fas fa-route"></i>
+                    <span>Resource Planning</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Monitoring & Analysis</div>
+                <a href="monitoring.html" class="sidebar-nav-link active">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>Live Monitoring</span>
+                </a>
+                <a href="visualization.html" class="sidebar-nav-link">
+                    <i class="fas fa-cube"></i>
+                    <span>3D Visualization</span>
+                </a>
+                <a href="analytics.html" class="sidebar-nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Data Analytics</span>
+                </a>
+            </div>
+        </nav>
+
+    </aside>
+
+    <!-- Professional Fixed Header -->
+    <header class="fixed-header">
+        <div class="header-container">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-controls">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search alerts, regions, data...">
+                </div>
+                <div class="header-status">
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span class="status-text">System Online</span>
+                    </div>
+                    <div class="last-update">
+                        <i class="fas fa-sync-alt"></i>
+                        <span id="header-update-time">2 min ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Monitoring & Alert System</h2>
+            <p>Real-time monitoring, alerts and data source management</p>
+        </div>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="alerts">
+                <i class="fas fa-bell"></i>
+                Active Alerts
+            </button>
+            <button class="tab-btn" data-tab="data-sources">
+                <i class="fas fa-database"></i>
+                Data Sources
+            </button>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div id="alerts" class="tab-content active">
+            <div class="alerts-container">
+                <div class="alerts-list">
+                    <div class="alert-item critical">
+                        <div class="alert-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Critical Fire Risk Warning</div>
+                            <div class="alert-description">High fire danger in Nainital District due to dry conditions and strong winds</div>
+                            <div class="alert-time">15 minutes ago</div>
+                        </div>
+                        <div class="alert-status">ACTIVE</div>
+                    </div>
+                    <div class="alert-item warning">
+                        <div class="alert-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Active Fire Detected</div>
+                            <div class="alert-description">Small fire spotted near Jim Corbett National Park - monitoring for spread</div>
+                            <div class="alert-time">1 hour ago</div>
+                        </div>
+                        <div class="alert-status">MONITORING</div>
+                    </div>
+                    <div class="alert-item info">
+                        <div class="alert-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Evacuation Recommendation</div>
+                            <div class="alert-description">Precautionary evacuation advised for villages near Almora forest areas</div>
+                            <div class="alert-time">3 hours ago</div>
+                        </div>
+                        <div class="alert-status">ADVISORY</div>
+                    </div>
+                    <div class="alert-item warning">
+                        <div class="alert-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">High Wind Warning</div>
+                            <div class="alert-description">Wind speeds exceeding 30 km/h expected in Dehradun region</div>
+                            <div class="alert-time">4 hours ago</div>
+                        </div>
+                        <div class="alert-status">WARNING</div>
+                    </div>
+                    <div class="alert-item info">
+                        <div class="alert-icon">
+                            <i class="fas fa-satellite"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Satellite Data Updated</div>
+                            <div class="alert-description">New MODIS imagery processed showing vegetation moisture levels</div>
+                            <div class="alert-time">6 hours ago</div>
+                        </div>
+                        <div class="alert-status">INFO</div>
+                    </div>
+                </div>
+                <div class="alert-actions">
+                    <button class="action-btn primary">
+                        <i class="fas fa-download"></i>
+                        Export Alerts
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-bell"></i>
+                        Alert Settings
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-filter"></i>
+                        Filter Alerts
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Agent Console for Autonomous Defense -->
+            <div class="ai-agent-section">
+                <div class="ai-agent-header">
+                    <div class="agent-title">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI Autonomous Defense Agent</h3>
+                    </div>
+                    <div class="agent-status-badge">
+                        <span class="status-dot green"></span>
+                        <span id="agent-status-text">AGENT STANDBY</span>
+                    </div>
+                </div>
+                <div class="ai-agent-console">
+                    <div id="ai-agent-logs" class="agent-logs">
+                        <p class="console-placeholder">Waiting for critical fire detection event...</p>
+                    </div>
+                    <div class="agent-controls">
+                        <div class="phone-input-group">
+                            <label for="agent-phone">Emergency Responder Phone (Demo):</label>
+                            <input type="text" id="agent-phone" placeholder="+91XXXXXXXXXX" value="+91">
+                        </div>
+                        <button class="agent-test-btn" onclick="triggerAIAgentDemo()">
+                            <i class="fas fa-paper-plane"></i>
+                            Manual Dispatch Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources Tab -->
+        <div id="data-sources" class="tab-content">
+            <div class="data-sources-grid">
+                <div class="source-card" data-source="satellite">
+                    <div class="source-icon">
+                        <i class="fas fa-satellite"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Satellite Data</h3>
+                        <p>MODIS, Sentinel-2 - Real-time imagery and vegetation indices</p>
+                        <div class="source-status active">
+                            <span class="status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <div class="source-card" data-source="weather">
+                    <div class="source-icon">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Weather Data</h3>
+                        <p>ERA5 (ECMWF) - Meteorological conditions and forecasts</p>
+                        <div class="source-status active">
+                            <span class="status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <div class="source-card" data-source="vegetation">
+                    <div class="source-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Vegetation Index</h3>
+                        <p>NDVI from Sentinel-2 - Forest health monitoring</p>
+                        <div class="source-status active">
+                            <span class="status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <div class="source-card" data-source="terrain">
+                    <div class="source-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Terrain Data</h3>
+                        <p>SRTM DEM (NASA) - Elevation and slope analysis</p>
+                        <div class="source-status active">
+                            <span class="status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <div class="source-card" data-source="human">
+                    <div class="source-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Human Activity</h3>
+                        <p>GHSL, OSM - Population and infrastructure data</p>
+                        <div class="source-status warning">
+                            <span class="status-dot"></span>
+                            Limited
+                        </div>
+                    </div>
+                </div>
+                <div class="source-card" data-source="sensors">
+                    <div class="source-icon">
+                        <i class="fas fa-thermometer"></i>
+                    </div>
+                    <div class="source-info">
+                        <h3>Ground Sensors</h3>
+                        <p>Weather Stations - Temperature, humidity, wind data</p>
+                        <div class="source-status active">
+                            <span class="status-dot"></span>
+                            247 Active
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Source Details -->
+            <div class="data-source-details">
+                <div class="detail-panel">
+                    <h3>Data Integration Status</h3>
+                    <div class="integration-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Data Sources</span>
+                            <span class="stat-value">6</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active Connections</span>
+                            <span class="stat-value">5</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Data Freshness</span>
+                            <span class="stat-value">2 min</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Processing Speed</span>
+                            <span class="stat-value">1.2 GB/s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!--Updated-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Simulation - AgniVeer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Left Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="brand">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    AgniVeer
+                </div>
+                <div class="sidebar-tagline">Forest Fire Intelligence Platform</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Core Features</div>
+                <a href="index.html" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="risk-analysis.html" class="sidebar-nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Risk Assessment</span>
+                </a>
+                <a href="simulation.html" class="sidebar-nav-link active">
+                    <i class="fas fa-fire"></i>
+                    <span>Fire Simulation</span>
+                </a>
+                <a href="optimization.html" class="sidebar-nav-link">
+                    <i class="fas fa-route"></i>
+                    <span>Resource Planning</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Monitoring & Analysis</div>
+                <a href="monitoring.html" class="sidebar-nav-link">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>Live Monitoring</span>
+                </a>
+                <a href="visualization.html" class="sidebar-nav-link">
+                    <i class="fas fa-cube"></i>
+                    <span>3D Visualization</span>
+                </a>
+                <a href="analytics.html" class="sidebar-nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Data Analytics</span>
+                </a>
+            </div>
+        </nav>
+        
+    </aside>
+
+    <!-- Professional Fixed Header -->
+    <header class="fixed-header">
+        <div class="header-container">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-controls">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search alerts, regions, data...">
+                </div>
+                <div class="header-status">
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span class="status-text">System Online</span>
+                    </div>
+                    <div class="last-update">
+                        <i class="fas fa-sync-alt"></i>
+                        <span id="header-update-time">2 min ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fire Spread Simulation Section -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Fire Spread Simulation</h2>
+            <p>Interactive Cellular Automata Fire Spread Model</p>
+        </div>
+        <div class="section-content simulation-layout">
+            <div class="simulation-container">
+                <div id="simulation-map" class="map"></div>
+                <div class="simulation-controls">
+                    <div class="control-group">
+                        <button id="play-simulation" class="control-btn primary">
+                            <i class="fas fa-play"></i>
+                            Play
+                        </button>
+                        <button id="pause-simulation" class="control-btn">
+                            <i class="fas fa-pause"></i>
+                            Pause
+                        </button>
+                        <button id="reset-simulation" class="control-btn">
+                            <i class="fas fa-refresh"></i>
+                            Reset
+                        </button>
+                    </div>
+                    <div class="speed-control">
+                        <label>Speed:</label>
+                        <input type="range" id="speed-slider" min="1" max="10" value="5">
+                        <span id="speed-value">5x</span>
+                    </div>
+                    <div class="time-display">
+                        <span>Simulation Time: </span>
+                        <span id="simulation-time">0 hours</span>
+                    </div>
+                </div>
+            </div>
+            <div class="simulation-monitoring">
+                <h3>Real-time Simulation Monitoring</h3>
+                <p class="chart-description">Live tracking of fire spread metrics during active simulation</p>
+                <div class="monitoring-chart-container">
+                    <canvas id="simulationMonitoringChart"></canvas>
+                </div>
+                <div class="monitoring-stats">
+                    <div class="monitoring-stat">
+                        <span class="stat-label">Total Area Burned</span>
+                        <span class="stat-value" id="totalBurnedArea">0 ha</span>
+                    </div>
+                    <div class="monitoring-stat">
+                        <span class="stat-label">Fire Perimeter</span>
+                        <span class="stat-value" id="firePerimeter">0 km</span>
+                    </div>
+                    <div class="monitoring-stat">
+                        <span class="stat-label">Spread Rate</span>
+                        <span class="stat-value" id="spreadRate">0 ha/hr</span>
+                    </div>
+                    <div class="monitoring-stat">
+                        <span class="stat-label">Active Fire Sources</span>
+                        <span class="stat-value" id="activeFireSources">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="parameters-panel">
+                <h3>Environmental Parameters</h3>
+                <div class="parameter-grid">
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Wind Speed</span>
+                            <span class="parameter-value" id="wind-speed">15 km/h</span>
+                        </div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Wind Direction</span>
+                            <span class="parameter-value" id="wind-direction">NE</span>
+                        </div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Temperature</span>
+                            <span class="parameter-value" id="temperature">32°C</span>
+                        </div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Humidity</span>
+                            <span class="parameter-value" id="humidity">45%</span>
+                        </div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Terrain Slope</span>
+                            <span class="parameter-value" id="terrain-slope">12°</span>
+                        </div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="parameter-info">
+                            <span class="parameter-label">Vegetation Density</span>
+                            <span class="parameter-value" id="vegetation-density">Dense</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What-If Analysis Panel -->
+        <div class="whatif-control-panel">
+            <div class="panel-header">
+                <h3>What-If Analysis</h3>
+                <p>Test different scenarios and see how fire behavior changes</p>
+                <div class="whatif-status">
+                    <i class="fas fa-flask"></i>
+                    <span>Scenario Testing Mode</span>
+                </div>
+            </div>
+
+            <div class="whatif-controls-grid">
+                <div class="control-group">
+                    <label for="whatif-wind-speed">Wind Speed</label>
+                    <div class="slider-container">
+                        <input type="range" id="whatif-wind-speed" min="0" max="50" value="22" class="whatif-slider">
+                        <span class="slider-value" id="wind-speed-value">22 km/h</span>
+                    </div>
+                    <div class="impact-indicator" id="wind-impact">
+                        <span>Current: High Impact</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="whatif-humidity">Humidity</label>
+                    <div class="slider-container">
+                        <input type="range" id="whatif-humidity" min="10" max="90" value="32" class="whatif-slider">
+                        <span class="slider-value" id="humidity-value">32%</span>
+                    </div>
+                    <div class="impact-indicator" id="humidity-impact">
+                        <span>Current: Critical Dryness</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="whatif-slope">Terrain Slope</label>
+                    <div class="slider-container">
+                        <input type="range" id="whatif-slope" min="0" max="45" value="15" class="whatif-slider">
+                        <span class="slider-value" id="slope-value">15°</span>
+                    </div>
+                    <div class="impact-indicator" id="slope-impact">
+                        <span>Current: Moderate Uphill</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="whatif-wind-direction">Wind Direction</label>
+                    <div class="direction-selector">
+                        <select id="whatif-wind-direction" class="direction-dropdown">
+                            <option value="N">North</option>
+                            <option value="NE" selected>Northeast</option>
+                            <option value="E">East</option>
+                            <option value="SE">Southeast</option>
+                            <option value="S">South</option>
+                            <option value="SW">Southwest</option>
+                            <option value="W">West</option>
+                            <option value="NW">Northwest</option>
+                        </select>
+                        <div class="direction-compass">
+                            <div class="compass-arrow" id="compass-arrow"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="whatif-actions">
+                <button class="whatif-btn primary" id="run-whatif">
+                    <i class="fas fa-play"></i>
+                    Run What-If Simulation
+                </button>
+                <button class="whatif-btn secondary" id="compare-scenarios">
+                    <i class="fas fa-exchange-alt"></i>
+                    Compare Scenarios
+                </button>
+                <button class="whatif-btn secondary" id="reset-whatif">
+                    <i class="fas fa-undo"></i>
+                    Reset to Current
+                </button>
+            </div>
+
+            <!-- Scenario Results -->
+            <div class="scenario-results" id="scenario-results" style="display: none;">
+                <div class="results-header">
+                    <h4>Scenario Comparison Results</h4>
+                </div>
+                <div class="results-grid">
+                    <div class="result-metric">
+                        <span class="metric-label">Spread Rate Change</span>
+                        <span class="metric-value" id="spread-rate-change">+35%</span>
+                        <span class="metric-impact">Faster spread</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Area Burned (6h)</span>
+                        <span class="metric-value" id="area-burned-change">450 ha</span>
+                        <span class="metric-impact">+120 ha increase</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Direction Change</span>
+                        <span class="metric-value" id="direction-change">15° shift</span>
+                        <span class="metric-impact">Northeast to East</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value" id="risk-level-change">Very High</span>
+                        <span class="metric-impact">Elevated from High</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js?v=4"></script>
+</body>
+</html>

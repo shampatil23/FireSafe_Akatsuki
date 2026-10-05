@@ -1,0 +1,307 @@
+<!--Updated-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Analysis - AgniVeer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Left Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="brand">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    AgniVeer
+                </div>
+                <div class="sidebar-tagline">Forest Fire Intelligence Platform</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Core Features</div>
+                <a href="index.html" class="sidebar-nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="risk-analysis.html" class="sidebar-nav-link active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Risk Assessment</span>
+                </a>
+                <a href="simulation.html" class="sidebar-nav-link">
+                    <i class="fas fa-fire"></i>
+                    <span>Fire Simulation</span>
+                </a>
+                <a href="optimization.html" class="sidebar-nav-link">
+                    <i class="fas fa-route"></i>
+                    <span>Resource Planning</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Monitoring & Analysis</div>
+                <a href="monitoring.html" class="sidebar-nav-link">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>Live Monitoring</span>
+                </a>
+                <a href="visualization.html" class="sidebar-nav-link">
+                    <i class="fas fa-cube"></i>
+                    <span>3D Visualization</span>
+                </a>
+                <a href="analytics.html" class="sidebar-nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Data Analytics</span>
+                </a>
+            </div>
+        </nav>
+        
+    </aside>
+
+    <!-- Professional Fixed Header -->
+    <header class="fixed-header">
+        <div class="header-container">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-controls">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search alerts, regions, data...">
+                </div>
+                <div class="header-status">
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span class="status-text">System Online</span>
+                    </div>
+                    <div class="last-update">
+                        <i class="fas fa-sync-alt"></i>
+                        <span id="header-update-time">2 min ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fire Risk Prediction Section -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Fire Risk Prediction & Analysis</h2>
+            <p>Advanced Neural Network Model for Fire Risk Assessment</p>
+        </div>
+        <div class="section-content">
+            <div class="map-container">
+                <div id="risk-map" class="map"></div>
+                <div class="map-controls">
+                    <button id="toggle-prediction" class="control-btn">
+                        <i class="fas fa-clock"></i>
+                        Show Next Day Prediction
+                    </button>
+                </div>
+            </div>
+            <div class="risk-panel">
+                <div class="panel-header">
+                    <h3>Current Risk Analysis</h3>
+                    <div class="update-time">Last updated: <span id="last-update">2 minutes ago</span></div>
+                </div>
+                <div class="risk-zones">
+                    <div class="risk-item high-risk">
+                        <div class="risk-color"></div>
+                        <div class="risk-info">
+                            <span class="risk-level">Very High Risk</span>
+                            <span class="risk-area">Nainital District</span>
+                        </div>
+                        <div class="risk-percentage">85%</div>
+                    </div>
+                    <div class="risk-item moderate-risk">
+                        <div class="risk-color"></div>
+                        <div class="risk-info">
+                            <span class="risk-level">High Risk</span>
+                            <span class="risk-area">Almora District</span>
+                        </div>
+                        <div class="risk-percentage">68%</div>
+                    </div>
+                    <div class="risk-item low-risk">
+                        <div class="risk-color"></div>
+                        <div class="risk-info">
+                            <span class="risk-level">Moderate Risk</span>
+                            <span class="risk-area">Dehradun District</span>
+                        </div>
+                        <div class="risk-percentage">42%</div>
+                    </div>
+                </div>
+
+                <!-- AI Explainability Section -->
+                <div class="ai-explainability-section">
+                    <div class="panel-header">
+                        <h3>AI Analysis & Explanations</h3>
+                        <div class="explanation-status">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>AI Analysis Active</span>
+                        </div>
+                    </div>
+
+                    <div class="plain-language-explanation">
+                        <div class="explanation-text" id="explanation-text">
+                            "Fire risk is elevated due to 22 km/h winds, dry vegetation (32% humidity), and 15° upward slope creating accelerated spread conditions."
+                        </div>
+                        <div class="explanation-confidence">
+                            <span>Confidence: 87%</span>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: 87%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Factor Analysis -->
+                    <div class="factor-breakdown">
+                        <h4>Risk Factor Analysis</h4>
+                        <div class="factor-item">
+                            <div class="factor-icon wind-factor">🌪️</div>
+                            <div class="factor-details">
+                                <span class="factor-name">Wind Speed</span>
+                                <span class="factor-impact">Primary Driver</span>
+                            </div>
+                            <div class="factor-percentage">75%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-icon dryness-factor">🌱</div>
+                            <div class="factor-details">
+                                <span class="factor-name">Vegetation Dryness</span>
+                                <span class="factor-impact">High Impact</span>
+                            </div>
+                            <div class="factor-percentage">68%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-icon slope-factor">⛰️</div>
+                            <div class="factor-details">
+                                <span class="factor-name">Terrain Slope</span>
+                                <span class="factor-impact">Moderate Impact</span>
+                            </div>
+                            <div class="factor-percentage">45%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="model-info">
+                    <h4>AI Model Performance</h4>
+                    <div class="performance-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Accuracy</span>
+                            <span class="metric-value">97.2%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Confidence</span>
+                            <span class="metric-value">94.8%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Risk Summary -->
+        <div class="regional-summary">
+            <div class="section-title">
+                <h3>Regional Risk Summary</h3>
+            </div>
+            <div class="regional-grid">
+                <div class="region-card very-high-risk">
+                    <div class="region-header">
+                        <span class="region-name">Nainital</span>
+                        <span class="risk-badge very-high">Very High</span>
+                    </div>
+                    <div class="risk-percentage">85%</div>
+                    <div class="region-details">
+                        <div class="detail-item">
+                            <i class="fas fa-thermometer-three-quarters"></i>
+                            <span>35°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <span>38%</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <span>18 km/h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="region-card high-risk">
+                    <div class="region-header">
+                        <span class="region-name">Almora</span>
+                        <span class="risk-badge high">High</span>
+                    </div>
+                    <div class="risk-percentage">68%</div>
+                    <div class="region-details">
+                        <div class="detail-item">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span>31°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <span>42%</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <span>16 km/h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="region-card moderate-risk">
+                    <div class="region-header">
+                        <span class="region-name">Dehradun</span>
+                        <span class="risk-badge moderate">Moderate</span>
+                    </div>
+                    <div class="risk-percentage">42%</div>
+                    <div class="region-details">
+                        <div class="detail-item">
+                            <i class="fas fa-thermometer-quarter"></i>
+                            <span>29°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <span>52%</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <span>12 km/h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="region-card low-risk">
+                    <div class="region-header">
+                        <span class="region-name">Haridwar</span>
+                        <span class="risk-badge low">Low</span>
+                    </div>
+                    <div class="risk-percentage">28%</div>
+                    <div class="region-details">
+                        <div class="detail-item">
+                            <i class="fas fa-thermometer-quarter"></i>
+                            <span>28°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <span>58%</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <span>10 km/h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Virtual environment
+venv/
+venv312/
+
+# Node modules
+node_modules/
