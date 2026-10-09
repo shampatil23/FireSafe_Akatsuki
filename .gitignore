@@ -1,16 +1,6 @@
-# Environment variables
-.env
-
-# Python
-__pycache__/
-*.pyc
-
-# Logs
-*.log
-
-# Virtual environment
-venv/
-venv312/
-
-# Node modules
-node_modules/
+env310/
+*.py
+!ml_api.py
+!ml_models.py
+!seed*.py
+.DS_Store

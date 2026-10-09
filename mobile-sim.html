@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AgniVeer - Citizen Mobile App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+            border: 8px solid #0f172a;
+        }
+
+        .header {
+            background: #ef4444;
+            color: white;
+            padding: 40px 20px 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .emergency-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            margin: 40px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4), inset 0 0 0 5px rgba(255,255,255,0.2);
+            transition: transform 0.1s;
+        }
+
+        .emergency-btn:active {
+            transform: scale(0.95);
+        }
+
+        .emergency-btn i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .status-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        
+        .badge-PENDING { background: #fee2e2; color: #ef4444; border: 1px solid #ef4444; }
+        .badge-ACKNOWLEDGED { background: #dbeafe; color: #3b82f6; border: 1px solid #3b82f6; }
+        .badge-RESPONDING { background: #ffedd5; color: #f97316; border: 1px solid #f97316; }
+        .badge-RESOLVED { background: #dcfce3; color: #22c55e; border: 1px solid #22c55e; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        #incidentStatus { font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
+    </style>
+    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js"></script>
+</head>
+<body>
+    
+    <!-- Centralized Firebase Config Setup -->
+    <script src="firebase-config.js"></script>
+
+    <div class="phone-frame">
+        <div class="header">
+            <i class="fas fa-fire-extinguisher" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <h1>AgniVeer Citizen</h1>
+        </div>
+        
+        <div class="content" id="reportView">
+            <p style="text-align: center; color: #64748b; margin-bottom: 20px;">Use this button only in case of a confirmed forest fire emergency.</p>
+            
+            <button class="emergency-btn" onclick="submitEmergency()">
+                <i class="fas fa-bullhorn"></i>
+                REPORT FIRE
+            </button>
+
+            <div class="form-group">
+                <label>Location Details (Optional)</label>
+                <input type="text" id="desc" placeholder="e.g., Heavy smoke near trail...">
+            </div>
+            <div class="form-group">
+                <label>Estimated Severity</label>
+                <select id="severity">
+                    <option value="CRITICAL">Critical (Large open flames)</option>
+                    <option value="HIGH" selected>High (Thick smoke visible)</option>
+                    <option value="MEDIUM">Medium (Small localized fire)</option>
+                    <option value="LOW">Low (Smoldering / Unsure)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="content" id="trackingView" style="display: none;">
+            <h2 style="font-size: 1.2rem; margin-top: 0;">Emergency Sent</h2>
+            <p style="color: #64748b; font-size: 0.9rem;">Your request has been instantly routed to the nearest Operator Dashboard.</p>
+            
+            <div class="status-card" id="statusCard" style="display: block;">
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px;">Incident ID: <span id="trackId"></span></div>
+                <div class="status-badge badge-PENDING" id="badgeUI">PENDING</div>
+                
+                <div style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                    <div style="font-size: 0.85rem; color: #64748b;">Live Status</div>
+                    <div id="incidentStatus" style="color: #1e293b;">Waiting for Operator...</div>
+                    <div id="operatorNote" style="font-size: 0.85rem; color: #64748b; margin-top: 10px; font-style: italic;"></div>
+                </div>
+            </div>
+
+            <button onclick="resetApp()" style="width: 100%; margin-top: 30px; padding: 15px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; color: #64748b; cursor: pointer;">Submit Another Report</button>
+        </div>
+    </div>
+
+    <script>
+        let currentRequestId = null;
+        let unsubscribe = null;
+
+        function submitEmergency() {
+            if (!db) {
+                alert("Firebase is not connected. Check firebase-config.js");
+                return;
+            }
+
+            const btn = document.querySelector('.emergency-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SENDING';
+            btn.style.background = '#94a3b8';
+
+            const reqId = "FF-" + Math.floor(Math.random() * 10000);
+            const desc = document.getElementById('desc').value || "Fire reported via mobile app.";
+            const severity = document.getElementById('severity').value;
+            
+            const payload = {
+                requestId: reqId,
+                userName: "Citizen Mobile User",
+                phone: "+91 99999 00000",
+                description: desc,
+                severity: severity,
+                latitude: 30.3 + (Math.random() * 0.1 - 0.05), // Random near Dehradun
+                longitude: 78.0 + (Math.random() * 0.1 - 0.05),
+                location: "GPS Auto-Detected Location",
+                status: "PENDING",
+                createdAt: new Date().toISOString()
+            };
+
+            db.ref("emergency_requests/" + reqId).set(payload).then(() => {
+                currentRequestId = reqId;
+                showTrackingView(reqId);
+                listenToUpdates(reqId);
+            }).catch(err => {
+                alert("Error sending request: " + err);
+                btn.innerHTML = '<i class="fas fa-bullhorn"></i> REPORT FIRE';
+                btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            });
+        }
+
+        function showTrackingView(reqId) {
+            document.getElementById('reportView').style.display = 'none';
+            document.getElementById('trackingView').style.display = 'block';
+            document.getElementById('trackId').innerText = reqId;
+        }
+
+        function listenToUpdates(reqId) {
+            const ref = db.ref("emergency_requests/" + reqId);
+            
+            const listener = ref.on('value', snapshot => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const badge = document.getElementById('badgeUI');
+                    const statusText = document.getElementById('incidentStatus');
+                    const notes = document.getElementById('operatorNote');
+
+                    badge.className = `status-badge badge-${data.status}`;
+                    badge.innerText = data.status;
+
+                    if (data.status === 'PENDING') statusText.innerText = "Waiting for Operator...";
+                    if (data.status === 'ACKNOWLEDGED') statusText.innerHTML = `✅ Accepted by Operator<br><span style='font-size:0.8rem;font-weight:normal;'>${data.operatorName || 'HQ'}</span>`;
+                    if (data.status === 'RESPONDING') statusText.innerHTML = `🚒 Fire Engine Dispatched`;
+                    if (data.status === 'RESOLVED') statusText.innerHTML = `✅ Incident Resolved`;
+
+                    if (data.operatorNote) {
+                        notes.innerText = '"' + data.operatorNote + '"';
+                    }
+                }
+            });
+            
+            unsubscribe = () => ref.off('value', listener);
+        }
+
+        function resetApp() {
+            if (unsubscribe) unsubscribe();
+            document.getElementById('reportView').style.display = 'block';
+            document.getElementById('trackingView').style.display = 'none';
+            
+            const btn = document.querySelector('.emergency-btn');
+            btn.innerHTML = '<i class="fas fa-bullhorn"></i> REPORT FIRE';
+            btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        }
+    </script>
+</body>
+</html>

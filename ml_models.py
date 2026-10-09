@@ -262,13 +262,20 @@ class CellularAutomataFireSpread:
         """Perform one step of fire spread simulation"""
         new_grid = self.grid.copy()
         
-        # Convert wind direction to vector
-        wind_x = np.cos(np.radians(wind_direction)) * wind_speed / 30.0
-        wind_y = np.sin(np.radians(wind_direction)) * wind_speed / 30.0
+        # Weather APIs conventionally express wind direction as the direction from which the wind originates.
+        # Convert the weather direction into the direction the wind pushes the fire.
+        fire_push_direction = (wind_direction + 180) % 360
+        
+        # Convert wind push direction to vector
+        wind_x = np.cos(np.radians(fire_push_direction))
+        wind_y = np.sin(np.radians(fire_push_direction))
         
         # Temperature and humidity effects
         temp_factor = min(temperature / 40.0, 1.5)
         humidity_factor = max(0.1, 1.0 - humidity / 100.0)
+        
+        # Wind influence bounded
+        wind_influence = min(1.0, wind_speed / 50.0)
         
         for i in range(1, self.grid_size[0] - 1):
             for j in range(1, self.grid_size[1] - 1):
@@ -297,14 +304,19 @@ class CellularAutomataFireSpread:
                                     
                                     # Wind effect
                                     wind_factor = 1.0
-                                    if abs(di - wind_x) < 0.5 and abs(dj - wind_y) < 0.5:
-                                        wind_factor = 1.8
+                                    norm = np.sqrt(di*di + dj*dj)
+                                    if norm > 0:
+                                        dir_x = di / norm
+                                        dir_y = dj / norm
+                                        alignment = dir_x * wind_x + dir_y * wind_y
+                                        # Increase probability downwind, reduce upwind
+                                        wind_factor = max(0.1, 1.0 + alignment * wind_influence * 1.5)
                                     
                                     # Moisture effect
                                     moisture_factor = max(0.1, 1.0 - self.moisture_map[ni, nj])
                                     
                                     # Calculate total probability
-                                    spread_prob = (base_prob * fuel_factor * slope_factor * 
+                                    spread_prob = min(0.95, base_prob * fuel_factor * slope_factor * 
                                                  wind_factor * temp_factor * humidity_factor * moisture_factor)
                                     
                                     if np.random.random() < spread_prob:
@@ -1108,28 +1120,57 @@ class FireRiskPredictor:
         # Initialize fire
         self.ca_simulator.ignite_fire(ignition_point[0], ignition_point[1])
         
-        # Convert wind direction string to degrees
-        wind_dir_map = {'N': 0, 'NE': 45, 'E': 90, 'SE': 135, 'S': 180, 'SW': 225, 'W': 270, 'NW': 315}
-        wind_direction_deg = wind_dir_map.get(environmental_data['wind_direction'], 0)
+        # Convert wind direction string to degrees if needed
+        wind_dir = environmental_data.get('wind_direction', 0)
+        if isinstance(wind_dir, str):
+            wind_dir_map = {'N': 0, 'NE': 45, 'E': 90, 'SE': 135, 'S': 180, 'SW': 225, 'W': 270, 'NW': 315}
+            wind_direction_deg = wind_dir_map.get(wind_dir, 0)
+        else:
+            wind_direction_deg = float(wind_dir)
+        
+        hourly_forecast = environmental_data.get('hourly_forecast')
+        start_index = 0
+        if hourly_forecast and 'time' in hourly_forecast:
+            # Find closest hour
+            import time as tm
+            now_ts = tm.time()
+            from datetime import datetime
+            for i, time_str in enumerate(hourly_forecast['time']):
+                try:
+                    dt = datetime.fromisoformat(time_str)
+                    if dt.timestamp() >= now_ts - 3600:
+                        start_index = i
+                        break
+                except:
+                    pass
         
         simulation_results = []
         
         # Run simulation for specified duration
         for hour in range(duration_hours):
-            # Simulate hourly variations
-            temp_variation = environmental_data['temperature'] + np.random.normal(0, 2)
-            humidity_variation = max(10, environmental_data['humidity'] + np.random.normal(0, 5))
-            wind_variation = max(0, environmental_data['wind_speed'] + np.random.normal(0, 3))
+            # Default to current or generated variations
+            temp_variation = environmental_data.get('temperature', 30) + np.random.normal(0, 2)
+            humidity_variation = max(10, environmental_data.get('humidity', 50) + np.random.normal(0, 5))
+            wind_variation = max(0, environmental_data.get('wind_speed', 15) + np.random.normal(0, 3))
+            current_wind_dir = wind_direction_deg
+            
+            # Use hourly forecast if available
+            if hourly_forecast and 'wind_speed_10m' in hourly_forecast:
+                fi = start_index + hour
+                if fi < len(hourly_forecast['wind_speed_10m']):
+                    wind_variation = hourly_forecast['wind_speed_10m'][fi]
+                    current_wind_dir = hourly_forecast['wind_direction_10m'][fi]
             
             # Perform spread step
             metrics = self.ca_simulator.spread_step(
-                wind_variation, wind_direction_deg, temp_variation, humidity_variation
+                wind_variation, current_wind_dir, temp_variation, humidity_variation
             )
             
             metrics['hour'] = hour
             metrics['temperature'] = temp_variation
             metrics['humidity'] = humidity_variation
             metrics['wind_speed'] = wind_variation
+            metrics['wind_direction'] = current_wind_dir
             
             simulation_results.append(metrics)
         

@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgniVeer - Firefighter Operator Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Compat version for simplicity in Vanilla JS prototype) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <style>
+        /* Specific Operator Dashboard Styles - Light Clean Theme */
+        body {
+            color: white;
+        }
+        
+        .main-wrapper {
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-dark, #0f172a); 
+        }
+
+        .topbar {
+            height: 70px;
+            background: rgba(30, 41, 59, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar .search-bar {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .topbar .search-bar i {
+            color: #94a3b8;
+        }
+
+        .topbar .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+        }
+
+        .topbar .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .topbar .user-profile .notifications i {
+            color: #94a3b8;
+        }
+
+        .kpi-banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px 20px 0 20px;
+        }
+
+        .kpi-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .operator-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            grid-template-rows: 1fr 320px;
+            height: calc(100vh - 190px);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .incident-list-panel {
+            grid-row: 1 / 3;
+            grid-column: 1 / 2;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            
+        }
+
+        .map-panel {
+            grid-row: 1 / 2;
+            grid-column: 2 / 3;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            
+        }
+
+        .details-panel {
+            grid-row: 2 / 3;
+            grid-column: 2 / 3;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .incident-items {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .incident-card {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .incident-card:hover, .incident-card.selected {
+            background: var(--bg-dark, #0f172a);
+        }
+
+        .severity-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+        .sev-high { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid #f97316; }
+        .sev-medium { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #eab308; }
+        .sev-low { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid #22c55e; }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--bg-dark, #0f172a);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .incident-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .incident-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-accept { background: #EF4444; color: white; }
+        .btn-accept:hover { background: #DC2626; }
+        
+        .btn-respond { background: #F97316; color: white; }
+        .btn-respond:hover { background: #EA580C; }
+        
+        .btn-resolve { background: #22C55E; color: white; }
+        .btn-resolve:hover { background: #16A34A; }
+
+        .btn-disabled { opacity: 0.5; pointer-events: none; }
+
+        /* New Request Alert */
+        .new-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 350px;
+            border: 1px solid #FEE2E2;
+            
+        }
+
+        .new-alert h3 {
+            color: #EF4444;
+        }
+
+        .new-alert.show {
+            transform: translateX(0);
+        }
+
+        #operatorMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item span {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item div {
+            font-weight: 500;
+            color: white;
+        }
+        
+        .op-notes {
+            margin-top: 15px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            height: 70px;
+            font-family: inherit;
+        }
+        
+        .op-notes:focus {
+            outline: none;
+            border-color: #EF4444;
+            background: rgba(30, 41, 59, 0.7);
+        }
+        
+        /* sidebar light overrides removed */
+        
+        
+        
+        
+        
+        
+        
+    </style>
+</head>
+
+<body>
+    <!-- Hidden audio element for alerts (Internal Local File) -->
+    <audio id="alertSound" src="./alarm.wav" preload="auto"></audio>
+    
+    <!-- Sidebar (Reused from existing) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="brand">
+                    <i class="fas fa-fire-extinguisher" style="color: #ef4444;"></i>
+                    Operator
+                </div>
+                <div class="sidebar-tagline">Emergency Command Center</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Operations</div>
+                <a href="operator.html" class="sidebar-nav-link active">
+                    <i class="fas fa-headset"></i>
+                    <span>Dispatcher Desk</span>
+                </a>
+                <a href="#" onclick="localStorage.removeItem('agniVeerToken'); localStorage.removeItem('agniVeerRole'); window.location.href='login.html';" class="sidebar-nav-link" style="margin-top: 20px; color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Change Role</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Incident ID...">
+            </div>
+            <div class="user-profile" style="display: flex; gap: 20px; align-items: center;">
+                <button id="enableSoundBtn" onclick="unlockAudio()" style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3B82F6; color: #60A5FA; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <i class="fas fa-bell-slash"></i> Enable Sound Alerts
+                </button>
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="alertBadge">0</span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Fire+Operator&background=ef4444&color=fff" alt="Profile" class="avatar">
+                <span>Station Commander</span>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="kpi-banner">
+            <div class="kpi-card">
+                <div class="kpi-label">Active Emergencies</div>
+                <div class="kpi-value" id="kpiActive">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label" style="color: #ef4444;">Critical Incidents</div>
+                <div class="kpi-value" id="kpiCritical" style="color: #ef4444;">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label" style="color: #eab308;">Pending Requests</div>
+                <div class="kpi-value" id="kpiPending" style="color: #eab308;">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label" style="color: #22c55e;">Resolved Today</div>
+                <div class="kpi-value" id="kpiResolved" style="color: #22c55e;">0</div>
+            </div>
+        </div>
+
+        <div class="operator-layout">
+            <!-- List Panel -->
+            <div class="incident-list-panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-list-ul"></i> Emergency Requests</span>
+                    <i class="fas fa-filter" style="color: #94a3b8; cursor: pointer;"></i>
+                </div>
+                <div class="incident-items" id="incidentList">
+                    <!-- Incidents injected here via JS -->
+                </div>
+            </div>
+
+            <!-- Map Panel -->
+            <div class="map-panel">
+                <div id="operatorMap"></div>
+            </div>
+
+            <!-- Details Panel -->
+            <div class="details-panel" id="incidentDetails" style="overflow-y: auto;">
+                <div style="text-align: center; color: #94a3b8; margin-top: 80px;">
+                    <i class="fas fa-mouse-pointer" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Select an incident from the list to view details and take action.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Alert Popup -->
+    <div class="new-alert" id="newAlertPopup">
+        <h3 style="margin-bottom: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> NEW EMERGENCY</h3>
+        <p style="margin-bottom: 5px;"><strong>Location:</strong> <span id="alertLoc"></span></p>
+        <p style="margin-bottom: 15px;"><strong>Severity:</strong> <span id="alertSev" class="severity-badge"></span></p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="dismissAlert()" style="flex:1; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(30, 41, 59, 0.7); color: #94a3b8; border-radius: 4px; cursor: pointer;">Dismiss</button>
+            <button onclick="viewLatestAlert()" style="flex:1; padding: 8px; border: none; background: #EF4444; color: white; font-weight: bold; border-radius: 4px; cursor: pointer;">View Incident</button>
+        </div>
+    </div>
+
+    <!-- Auto-Simulation Modal using Iframe -->
+    <div id="autoSimModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #1e293b; width: 95%; max-width: 1400px; height: 90vh; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            <div style="padding: 15px 20px; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-satellite-dish" style="color: #8B5CF6;"></i> 
+                    Auto-Simulation: Real-Time Predictor
+                </h3>
+                <button onclick="closeAutoSimulation()" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 1.5rem;">&times;</button>
+            </div>
+            
+            <iframe id="simIframe" src="" style="flex: 1; width: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <!-- Ambulance Dispatch Modal -->
+    <div id="ambulanceDispatchModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div style="background: #1e293b; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); text-align: center; padding: 40px 20px; position: relative;">
+            <div id="dispatchIcon" style="font-size: 4rem; color: #F97316; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+                <i class="fas fa-truck-medical"></i>
+            </div>
+            <h2 id="dispatchTitle" style="color: white; margin-bottom: 15px; font-size: 1.5rem;">Initializing Dispatch...</h2>
+            
+            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left;">
+                <div id="dispatchLog1" style="color: #94a3b8; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Scanning for nearby hospitals within 15km...</div>
+                <div id="dispatchLog2" style="color: #22C55E; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i> Matched with District General Hospital (4.2km away)</div>
+                <div id="dispatchLog3" style="color: #3B82F6; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-satellite-dish" style="margin-right: 8px;"></i> Transmitting SOS coordinates to Ambulance ALS-07...</div>
+                <div id="dispatchLog4" style="color: #F97316; font-weight: bold; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-truck-fast" style="margin-right: 8px;"></i> Ambulance En Route! ETA: 8 minutes.</div>
+            </div>
+            
+            <button id="dispatchCloseBtn" onclick="closeDispatchModal()" style="display: none; width: 100%; padding: 12px; border: none; background: #3B82F6; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s;">Acknowledge & Close</button>
+        </div>
+    </div>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Load Firebase Config First -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        // --- 2. LOCAL MOCK DATA (Fallback if Firestore isn't connected) ---
+        let incidents = [
+            {
+                id: "REQ-001",
+                userName: "Harsh Shinde (Demo)",
+                contact: "+91 98765 43210",
+                latitude: 18.4640,
+                longitude: 73.8680,
+                location: "VIT Bibwewadi Campus, FV79+C7 Pune",
+                description: "Smoke observed near the main campus ground.",
+                severity: "HIGH",
+                createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+                status: "PENDING"
+            },
+            {
+                id: "REQ-002",
+                userName: "Forest Guard Unit B",
+                contact: "Radio CH-4",
+                latitude: 30.2900,
+                longitude: 78.0100,
+                location: "Dehradun Outskirts",
+                description: "Small brush fire, currently contained.",
+                severity: "LOW",
+                createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+                status: "ACKNOWLEDGED"
+            }
+        ];
+
+        let selectedIncidentId = null;
+        let map, marker, circle;
+
+        // --- 3. INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            
+            if (db) {
+                setupDatabaseListener();
+            } else {
+                renderList();
+                // Simulate a new request arriving after 5 seconds
+                setTimeout(simulateIncomingRequest, 5000);
+            }
+        });
+
+        function initMap() {
+            map = L.map('operatorMap', { zoomControl: false }).setView([30.3165, 78.0322], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+        }
+
+        // --- 4. FIREBASE RTDB REAL-TIME LISTENER ---
+        let firebaseData = { emergency: {}, sos: {} };
+
+        function setupDatabaseListener() {
+            db.ref("emergency_requests").on("value", (snapshot) => {
+                firebaseData.emergency = snapshot.val() || {};
+                mergeAndRenderIncidents();
+            });
+
+            db.ref("sos_dispatches").on("value", (snapshot) => {
+                firebaseData.sos = snapshot.val() || {};
+                mergeAndRenderIncidents();
+            });
+        }
+
+        function decodeFirebaseKey(id) {
+            const PUSH_CHARS = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+            id = id.substring(0, 8);
+            let timestamp = 0;
+            for (let i = 0; i < 8; i++) {
+                timestamp = timestamp * 64 + PUSH_CHARS.indexOf(id.charAt(i));
+            }
+            return timestamp;
+        }
+
+        function mergeAndRenderIncidents() {
+            let newIncidents = [];
+            let oldIncidentIds = incidents.map(i => i.id);
+
+            // 1. Process regular emergency requests
+            Object.keys(firebaseData.emergency).forEach(key => {
+                const inc = firebaseData.emergency[key];
+                
+                let dateObj = new Date();
+                if (inc.timestamp) {
+                    let ts = inc.timestamp;
+                    if (typeof ts === 'number') dateObj = new Date(ts);
+                    else dateObj = new Date(ts.replace(" ", "T"));
+                } else if (key && key.startsWith('-')) {
+                    dateObj = new Date(decodeFirebaseKey(key));
+                }
+                if (isNaN(dateObj.getTime())) dateObj = new Date();
+
+                let receivedDate = dateObj.toLocaleDateString();
+                let receivedTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+
+                if (!oldIncidentIds.includes(key) && inc.status === 'PENDING') {
+                    triggerAlert({ id: key, ...inc, alert_date: receivedDate, alert_time: receivedTime });
+                }
+                newIncidents.push({ id: key, ...inc, alert_date: receivedDate, alert_time: receivedTime });
+            });
+
+            // 2. Process Android App SOS Dispatches
+            Object.keys(firebaseData.sos).forEach(key => {
+                const sos = firebaseData.sos[key];
+                
+                // Map the Android schema to the Operator Dashboard schema
+                // Parse real time from Android SOS timestamp or Firebase Push ID
+                let dateObj = new Date();
+                if (sos.timestamp) {
+                    let ts = sos.timestamp;
+                    if (typeof ts === 'number') dateObj = new Date(ts);
+                    else dateObj = new Date(ts.replace(" ", "T"));
+                } else if (key && key.startsWith('-')) {
+                    dateObj = new Date(decodeFirebaseKey(key));
+                }
+                if (isNaN(dateObj.getTime())) dateObj = new Date();
+
+                let isoDate = dateObj.toISOString();
+                let receivedDate = dateObj.toLocaleDateString();
+                let receivedTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+
+                const mappedInc = {
+                    id: key, // Use the firebase key
+                    createdAt: isoDate,
+                    severity: sos.severity || "CRITICAL",
+                    status: (sos.status === "SENDING" || sos.status === "ACTIVE_SOS") ? "PENDING" : sos.status,
+                    location: sos.location_name || sos.location || "GPS Location",
+                    description: `🚨 SOS ALERT! Type: ${sos.emergency_type || 'Unknown'}. Device: ${sos.device_info || 'Unknown'}. Battery: ${sos.battery_percent || sos.battery}%`,
+                    userName: "SOS Dispatch (Mobile)",
+                    contact: sos.phone || "+91 112",
+                    latitude: sos.latitude || sos.lat,
+                    longitude: sos.longitude || sos.lng,
+                    cloudinary_url: sos.cloudinary_url || sos.audio_url || null,
+                    audio_url: sos.audio_url || sos.cloudinary_url || null,
+                    alert_date: receivedDate,
+                    alert_time: receivedTime
+                };
+
+                if (!oldIncidentIds.includes(key) && mappedInc.status === 'PENDING') {
+                    triggerAlert(mappedInc);
+                }
+                newIncidents.push(mappedInc);
+            });
+            
+            incidents = newIncidents;
+            renderList();
+
+            if (selectedIncidentId) {
+                const selected = incidents.find(i => i.id === selectedIncidentId);
+                if (selected) renderDetails(selected);
+            }
+        }
+
+        // --- 5. RENDER FUNCTIONS ---
+        function renderList() {
+            const listEl = document.getElementById('incidentList');
+            listEl.innerHTML = '';
+            
+            // Sorting Logic: Critical > High > Medium > Low, then by timestamp
+            const severityRank = { 'CRITICAL': 4, 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };
+            
+            const sorted = [...incidents].sort((a, b) => {
+                const sevA = severityRank[a.severity] || 0;
+                const sevB = severityRank[b.severity] || 0;
+                if (sevA !== sevB) {
+                    return sevB - sevA;
+                }
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date();
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date();
+                return dateB - dateA;
+            });
+
+            // Update KPIs
+            let active = 0, critical = 0, pending = 0, resolved = 0;
+
+            sorted.forEach(inc => {
+                if (inc.status !== 'RESOLVED') active++;
+                if (inc.severity === 'CRITICAL' && inc.status !== 'RESOLVED') critical++;
+                if (inc.status === 'PENDING') pending++;
+                if (inc.status === 'RESOLVED') resolved++; // Simply counting all resolved for prototype
+
+                const safeDateStr = inc.alert_date ? inc.alert_date : (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : 'Unknown Date');
+                const safeTimeStr = inc.alert_time ? inc.alert_time : (inc.createdAt ? new Date(inc.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Unknown Time');
+
+                const div = document.createElement('div');
+                div.className = `incident-card ${inc.id === selectedIncidentId ? 'selected' : ''}`;
+                div.onclick = () => selectIncident(inc.id);
+                
+                const safeUserName = inc.userName || "Android User";
+                const safeSeverity = inc.severity || "MEDIUM";
+                const safeLocation = inc.location || "Unknown Location";
+                const safeStatus = inc.status || "PENDING";
+                
+                div.innerHTML = `
+                    <div class="incident-meta">
+                        <span>${safeTimeStr} • ID: ${inc.id.substring(0, 8)}</span>
+                        <span class="status-badge">${safeStatus}</span>
+                    </div>
+                    <div class="incident-title">${safeLocation}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                        <span style="font-size: 0.85rem; color: #94a3b8;"><i class="fas fa-user"></i> ${safeUserName}</span>
+                        <span class="severity-badge sev-${safeSeverity.toLowerCase()}">${safeSeverity}</span>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+            
+            // Render KPIs
+            document.getElementById('kpiActive').innerText = active;
+            document.getElementById('kpiCritical').innerText = critical;
+            document.getElementById('kpiPending').innerText = pending;
+            document.getElementById('kpiResolved').innerText = resolved;
+            
+            document.getElementById('alertBadge').innerText = pending;
+        }
+
+        function selectIncident(id) {
+            selectedIncidentId = id;
+            renderList(); // highlight selected
+            const inc = incidents.find(i => i.id === id);
+            if(inc) {
+                renderDetails(inc);
+                
+                // Update Local Traditional Map
+                const lat = parseFloat(inc.latitude || inc.lat) || 18.4640;
+                const lng = parseFloat(inc.longitude || inc.lng) || 73.8680;
+                
+                if (map) {
+                    map.flyTo([lat, lng], 15, { animate: true, duration: 1.5 });
+                    
+                    if (marker) map.removeLayer(marker);
+                    if (circle) map.removeLayer(circle);
+                    
+                    marker = L.marker([lat, lng]).addTo(map);
+                    
+                    const color = inc.severity === 'CRITICAL' ? '#EF4444' : 
+                                  inc.severity === 'HIGH' ? '#F97316' : 
+                                  inc.severity === 'MEDIUM' ? '#F59E0B' : '#3B82F6';
+                    
+                    circle = L.circle([lat, lng], {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.3,
+                        radius: 300
+                    }).addTo(map);
+                }
+            }
+        }
+
+        function renderDetails(inc) {
+            const detailsEl = document.getElementById('incidentDetails');
+            
+            const safeDateStr = inc.alert_date ? inc.alert_date : (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : 'Unknown Date');
+            const safeTimeStr = inc.alert_time ? inc.alert_time : (inc.createdAt ? new Date(inc.createdAt).toLocaleTimeString() : 'Unknown Time');
+            
+            // Determine button states
+            const acceptDis = inc.status !== 'PENDING' ? 'btn-disabled' : '';
+            const respondDis = (inc.status === 'RESOLVED' || inc.status === 'RESPONDING') ? 'btn-disabled' : '';
+            const resolveDis = inc.status === 'RESOLVED' ? 'btn-disabled' : '';
+
+            // Determine safe values
+            const safeSeverity = inc.severity || "MEDIUM";
+            const safeLocation = inc.location || "GPS Location";
+            const safeUserName = inc.userName || "Mobile User";
+            const safeDesc = inc.description || "No description provided.";
+
+            detailsEl.innerHTML = `
+                <div class="panel-header" style="margin: -20px -20px 20px -20px; border-radius: 16px 16px 0 0;">
+                    <span style="font-size: 1.1rem; color: white;">Incident: ${inc.id}</span>
+                    <span class="severity-badge sev-${safeSeverity.toLowerCase()}">${safeSeverity}</span>
+                </div>
+                
+                <h2 style="margin-bottom: 5px; color: white;">${safeLocation}</h2>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">${safeDesc}</p>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span>Reported By</span>
+                        <div>${safeUserName}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span>Contact</span>
+                        <div>${inc.contact || inc.phone || "No Contact Provided"}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span>Alert Date</span>
+                        <div>${safeDateStr}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span>Alert Time</span>
+                        <div>${safeTimeStr}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span>Current Status</span>
+                        <div><strong style="color: #3B82F6;">${inc.status}</strong></div>
+                    </div>
+                    <div class="detail-item">
+                        <span>Coordinates</span>
+                        <div>${parseFloat(inc.latitude || 18.4640).toFixed(4)}, ${parseFloat(inc.longitude || 73.8680).toFixed(4)}</div>
+                    </div>
+                </div>
+
+                ${(inc.cloudinary_url || inc.audio_url) ? `
+                <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
+                    <strong style="color: #f8fafc; font-size: 0.88rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-microphone-alt" style="color: #EF4444;"></i>
+                        SOS Voice Recording
+                        <span style="font-size: 0.72rem; background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); padding: 2px 8px; border-radius: 20px; font-weight: 600;">LIVE</span>
+                    </strong>
+                    <div style="margin-top: 10px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px;">
+                        <audio controls style="width: 100%; outline: none; border-radius: 6px; filter: invert(0.85) hue-rotate(180deg);">
+                            <source src="${inc.cloudinary_url || inc.audio_url}" type="audio/mp4">
+                            <source src="${inc.cloudinary_url || inc.audio_url}" type="video/mp4">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; color: #94a3b8;"><i class="fas fa-cloud"></i> Cloudinary · Uploaded from device</span>
+                            <a href="${inc.cloudinary_url || inc.audio_url}" target="_blank" style="font-size: 0.72rem; color: #3B82F6; text-decoration: none;">
+                                <i class="fas fa-external-link-alt"></i> Open
+                            </a>
+                        </div>
+                    </div>
+                </div>` : ''}
+
+                <textarea class="op-notes" id="opNotes" placeholder="Add operational notes..."></textarea>
+
+                <div class="action-buttons">
+                    <button class="action-btn btn-accept ${acceptDis}" onclick="updateStatus('${inc.id}', 'ACKNOWLEDGED')">
+                        <i class="fas fa-check-circle"></i> Accept
+                    </button>
+                    <button class="action-btn btn-respond ${respondDis}" onclick="updateStatus('${inc.id}', 'RESPONDING')">
+                        <i class="fas fa-truck-fast"></i> Responding
+                    </button>
+                    <button class="action-btn btn-resolve ${resolveDis}" onclick="updateStatus('${inc.id}', 'RESOLVED')">
+                        <i class="fas fa-shield-alt"></i> Resolve
+                    </button>
+                </div>
+            `;
+
+            // Update Map
+            if (marker) map.removeLayer(marker);
+            if (circle) map.removeLayer(circle);
+
+            const latlng = [inc.latitude, inc.longitude];
+            
+            let markerColor = inc.severity === 'CRITICAL' ? '#ef4444' : inc.severity === 'HIGH' ? '#f97316' : '#eab308';
+            
+            circle = L.circle(latlng, {
+                color: markerColor,
+                fillColor: markerColor,
+                fillOpacity: 0.2,
+                radius: 500
+            }).addTo(map);
+
+            marker = L.marker(latlng).addTo(map);
+            map.flyTo(latlng, 14, { duration: 1.5 });
+        }
+
+        // --- 6. ACTIONS ---
+        function updateStatus(id, newStatus) {
+            const notes = document.getElementById('opNotes').value;
+            
+            // Get incident details for simulation if resolving
+            const inc = incidents.find(i => i.id === id);
+            
+            if (db) {
+                // Update RTDB
+                const updatePayload = {
+                    status: newStatus,
+                    operatorNote: notes,
+                    operatorId: "OP-01",
+                    operatorName: "Station Alpha",
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (newStatus === 'ACKNOWLEDGED') updatePayload.acceptedAt = new Date().toISOString();
+                if (newStatus === 'RESOLVED') updatePayload.resolvedAt = new Date().toISOString();
+
+                db.ref("emergency_requests/" + id).update(updatePayload).then(() => {
+                    if (newStatus === 'RESOLVED' && inc) {
+                        openAutoSimulation(inc.id, inc.latitude, inc.longitude);
+                    }
+                    if (newStatus === 'RESPONDING' && inc) {
+                        simulateAmbulanceDispatch(inc.id, inc.latitude, inc.longitude);
+                    }
+                }).catch(err => alert("Error updating status: " + err));
+            } else {
+                // Mock update
+                const idx = incidents.findIndex(i => i.id === id);
+                if (idx > -1) {
+                    incidents[idx].status = newStatus;
+                    incidents[idx].operatorNote = notes;
+                    renderList();
+                    if(selectedIncidentId === id) renderDetails(incidents[idx]);
+                    
+                    if (newStatus === 'RESOLVED') {
+                        openAutoSimulation(inc.id, inc.latitude, inc.longitude);
+                    }
+                    if (newStatus === 'RESPONDING') {
+                        simulateAmbulanceDispatch(inc.id, inc.latitude, inc.longitude);
+                    }
+                }
+            }
+        }
+
+        // --- 7. MOCK/ALERT HELPERS ---
+        function triggerAlert(data) {
+            document.getElementById('alertLoc').innerText = data.location;
+            const sevBadge = document.getElementById('alertSev');
+            sevBadge.innerText = data.severity;
+            sevBadge.className = `severity-badge sev-${data.severity.toLowerCase()}`;
+            
+            document.getElementById('newAlertPopup').classList.add('show');
+            
+            // Audio alert (Internal Buzzer sound)
+            try {
+                const audioEl = document.getElementById('alertSound');
+                if (audioEl) {
+                    audioEl.currentTime = 0;
+                    audioEl.volume = 1.0;
+                    audioEl.play().catch(e => {
+                        console.log("Autoplay prevented:", e);
+                        const btn = document.getElementById('enableSoundBtn');
+                        if (btn) {
+                            btn.style.background = 'rgba(239, 68, 68, 0.2)';
+                            btn.style.borderColor = '#EF4444';
+                            btn.style.color = '#F87171';
+                            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Click to Enable Sound';
+                        }
+                    });
+                }
+            } catch(e) {
+                console.error("Audio playback error:", e);
+            }
+        }
+
+        // Unlock audio context for modern browsers
+        function unlockAudio() {
+            const audioEl = document.getElementById('alertSound');
+            if (audioEl) {
+                // Play and immediately pause to satisfy browser interaction requirement without making noise
+                audioEl.volume = 0;
+                audioEl.play().then(() => {
+                    audioEl.pause();
+                    audioEl.currentTime = 0;
+                    audioEl.volume = 1.0; // Reset for actual alerts
+                    
+                    const btn = document.getElementById('enableSoundBtn');
+                    btn.style.background = 'rgba(16, 185, 129, 0.2)';
+                    btn.style.borderColor = '#10B981';
+                    btn.style.color = '#34D399';
+                    btn.innerHTML = '<i class="fas fa-volume-up"></i> Sound Enabled';
+                }).catch(e => console.error("Could not unlock audio", e));
+            }
+        }
+
+        function dismissAlert() {
+            document.getElementById('newAlertPopup').classList.remove('show');
+        }
+
+        function viewLatestAlert() {
+            dismissAlert();
+            // Find newest pending
+            const newest = [...incidents].sort((a,b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date();
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date();
+                return dateB - dateA;
+            }).find(i => i.status === 'PENDING');
+            if (newest) selectIncident(newest.id);
+        }
+
+        function simulateIncomingRequest() {
+            if (db) return; // Don't mock if connected to firestore
+            
+            const newReq = {
+                id: "REQ-" + Math.floor(Math.random()*1000),
+                userName: "Local Trekker",
+                contact: "+91 91234 56789",
+                latitude: 30.3500,
+                longitude: 78.0500,
+                location: "Mussoorie Hills Trail",
+                description: "Spotted flames rapidly spreading uphill.",
+                severity: "CRITICAL",
+                createdAt: new Date().toISOString(),
+                status: "PENDING"
+            };
+            
+            incidents.unshift(newReq);
+            renderList();
+            triggerAlert(newReq);
+        }
+        // ------------------ AUTO-SIMULATION LOGIC ------------------
+        function openAutoSimulation(id, lat, lng) {
+            document.getElementById('autoSimModal').style.display = 'flex';
+            // Parse to float just in case they are strings in Firebase, fallback to FV79+C7 Pune if invalid
+            const finalLat = parseFloat(lat) || 18.4640;
+            const finalLng = parseFloat(lng) || 73.8680;
+            // Load the actual simulation dashboard in the iframe, passing the SOS coordinates to auto-start
+            document.getElementById('simIframe').src = `simulation.html?lat=${finalLat}&lng=${finalLng}&autoStart=true`;
+        }
+
+        function closeAutoSimulation() {
+            document.getElementById('autoSimModal').style.display = 'none';
+            document.getElementById('simIframe').src = ''; // Clear iframe to stop simulation and audio
+        }
+
+        // ------------------ AMBULANCE DISPATCH LOGIC ------------------
+        function simulateAmbulanceDispatch(id, lat, lng) {
+            const modal = document.getElementById('ambulanceDispatchModal');
+            const title = document.getElementById('dispatchTitle');
+            const icon = document.getElementById('dispatchIcon');
+            const btn = document.getElementById('dispatchCloseBtn');
+            const l1 = document.getElementById('dispatchLog1');
+            const l2 = document.getElementById('dispatchLog2');
+            const l3 = document.getElementById('dispatchLog3');
+            const l4 = document.getElementById('dispatchLog4');
+
+            // Reset modal state
+            title.textContent = "Initializing Dispatch...";
+            title.style.color = "white";
+            icon.innerHTML = '<i class="fas fa-truck-medical"></i>';
+            icon.style.color = "#F97316";
+            icon.style.animation = "pulse 1.5s infinite";
+            btn.style.display = "none";
+            l1.style.opacity = "0";
+            l2.style.opacity = "0";
+            l3.style.opacity = "0";
+            l4.style.opacity = "0";
+            
+            modal.style.display = 'flex';
+
+            // Sequence animations
+            setTimeout(() => { l1.style.opacity = "1"; }, 500);
+            
+            setTimeout(() => { 
+                l1.innerHTML = '<i class="fas fa-check" style="margin-right: 8px;"></i> Scan complete';
+                l2.style.opacity = "1"; 
+            }, 2000);
+            
+            setTimeout(() => { l3.style.opacity = "1"; }, 3500);
+            
+            setTimeout(() => { 
+                l4.style.opacity = "1"; 
+                title.textContent = "Ambulance Dispatched!";
+                title.style.color = "#22C55E";
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.style.color = "#22C55E";
+                icon.style.animation = "none";
+                btn.style.display = "block";
+            }, 5500);
+        }
+
+        function closeDispatchModal() {
+            document.getElementById('ambulanceDispatchModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

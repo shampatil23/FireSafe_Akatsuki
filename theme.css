@@ -1,0 +1,353 @@
+/* theme.css - Light Theme Overrides */
+
+body.light-theme {
+    background: #F3F4F6 !important;
+    color: #1F2937 !important;
+}
+
+body.light-theme::before,
+body.light-theme::after {
+    display: none !important;
+}
+
+body.light-theme .main-wrapper,
+body.light-theme .main-content {
+    background: #F3F4F6 !important;
+}
+
+/* Sidebar */
+body.light-theme .sidebar {
+    background: #F8FAFC !important;
+    border-right: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+}
+
+body.light-theme .sidebar-header,
+body.light-theme .sidebar-logo .brand {
+    color: #1F2937 !important;
+}
+
+body.light-theme .sidebar-tagline,
+body.light-theme .nav-section-title {
+    color: #6B7280 !important;
+}
+
+body.light-theme .sidebar-nav-link {
+    color: #4B5563 !important;
+}
+
+body.light-theme .sidebar-nav-link:hover {
+    background: #F3F4F6 !important;
+    color: #1F2937 !important;
+}
+
+body.light-theme .sidebar-nav-link.active {
+    background: #FEE2E2 !important;
+    color: #EF4444 !important;
+    border-left-color: #EF4444 !important;
+}
+
+/* Topbar / Header */
+body.light-theme .topbar,
+body.light-theme .fixed-header,
+body.light-theme .glass-nav {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+    box-shadow: none !important;
+}
+
+body.light-theme .search-bar,
+body.light-theme .header-search {
+    background: #F8FAFC !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+body.light-theme .search-bar input,
+body.light-theme .header-search input {
+    color: #1F2937 !important;
+}
+
+body.light-theme .search-bar i,
+body.light-theme .header-search i {
+    color: #6B7280 !important;
+}
+
+body.light-theme .user-profile,
+body.light-theme .header-status {
+    color: #1F2937 !important;
+}
+
+/* Cards & Panels */
+body.light-theme .kpi-card,
+body.light-theme .stat-card,
+body.light-theme .info-card,
+body.light-theme .incident-list-panel,
+body.light-theme .details-panel,
+body.light-theme .panel,
+body.light-theme .glass-panel,
+body.light-theme .card,
+body.light-theme .form-container,
+body.light-theme .feature-card,
+body.light-theme .activity-feed-section,
+body.light-theme .risk-summary-section,
+body.light-theme .regional-risk-section,
+body.light-theme .activity-item,
+body.light-theme .region-card,
+body.light-theme .condition-card,
+body.light-theme .risk-item,
+body.light-theme .monitoring-stat,
+body.light-theme .parameter-item,
+body.light-theme .alert-item,
+body.light-theme .source-card,
+body.light-theme .toast,
+body.light-theme .scenario-item,
+body.light-theme .badge-item,
+body.light-theme .challenge-card,
+body.light-theme .stats-panel,
+body.light-theme .badges-panel,
+body.light-theme .challenge-panel,
+body.light-theme .scenario-selector,
+body.light-theme .control-panel,
+body.light-theme .parameters-panel,
+body.light-theme .whatif-control-panel,
+body.light-theme .monitoring-panel,
+body.light-theme .map-container,
+body.light-theme .data-panel,
+body.light-theme .info-panel,
+body.light-theme .glass-card,
+body.light-theme .resource-config-panel,
+body.light-theme .optimization-results,
+body.light-theme .deployment-map-container,
+body.light-theme .metric-card,
+body.light-theme .recommendation-item,
+body.light-theme .resource-input-group,
+body.light-theme .tab-btn,
+body.light-theme .data-source-panel,
+body.light-theme .risk-panel,
+body.light-theme .prediction-card,
+body.light-theme .firevision-controls,
+body.light-theme .viz-mode-selector,
+body.light-theme .viz-mode-btn,
+body.light-theme .control-btn,
+body.light-theme .setting-group,
+body.light-theme .ai-explainability-section,
+body.light-theme .plain-language-explanation,
+body.light-theme .factor-breakdown,
+body.light-theme .model-info,
+body.light-theme .factor-item,
+body.light-theme .analytics-card,
+body.light-theme .carbon-emissions-panel,
+body.light-theme .environmental-impact-panel,
+body.light-theme .metric,
+body.light-theme .emission-metric,
+body.light-theme .impact-category,
+body.light-theme .report-generation,
+body.light-theme .strategy-item-enhanced,
+body.light-theme .action-btn.secondary {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+    color: #1F2937 !important;
+}
+
+body.light-theme .action-btn.secondary:hover {
+    background: #F8FAFC !important;
+    border-color: #CBD5E1 !important;
+}
+
+body.light-theme .analytics-card:hover {
+    background: #F8FAFC !important;
+    border-color: #CBD5E1 !important;
+}
+
+body.light-theme .feature-card::before,
+body.light-theme .feature-card::after,
+body.light-theme .feature-icon::before,
+body.light-theme .feature-icon::after {
+    display: none !important; /* Remove any underlying orange glow pseudo-elements */
+}
+
+body.light-theme .feature-icon {
+    background: #FFF7ED !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+}
+
+body.light-theme .activity-feed-section,
+body.light-theme .risk-summary-section {
+    background: #FFFFFF !important;
+}
+
+body.light-theme .kpi-label,
+body.light-theme .stat-label,
+body.light-theme .panel-title,
+body.light-theme .activity-time,
+body.light-theme .parameter-label,
+body.light-theme .scenario-desc,
+body.light-theme .source-time,
+body.light-theme .region-name,
+body.light-theme .metric-label,
+body.light-theme .score-label,
+body.light-theme .unit-label,
+body.light-theme .slider-value,
+body.light-theme .impact-indicator span,
+body.light-theme .explanation-text,
+body.light-theme .factor-impact,
+body.light-theme .risk-level,
+body.light-theme .explanation-confidence span,
+body.light-theme .strategy-timeline,
+body.light-theme .progress-text {
+    color: #4B5563 !important;
+}
+
+body.light-theme .kpi-value,
+body.light-theme .stat-number,
+body.light-theme .panel-header h2,
+body.light-theme .panel-header h3,
+body.light-theme h4,
+body.light-theme .parameter-value,
+body.light-theme .metric-value,
+body.light-theme .score-value,
+body.light-theme .resource-input-group label,
+body.light-theme .control-group label,
+body.light-theme .setting-group label,
+body.light-theme .viz-mode-btn,
+body.light-theme .control-btn,
+body.light-theme .factor-name,
+body.light-theme .factor-percentage,
+body.light-theme .risk-area,
+body.light-theme .performance-metrics .metric-value {
+    color: #1F2937 !important;
+}
+
+body.light-theme .panel-header,
+body.light-theme .section-header {
+    background: #F8FAFC !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+}
+
+/* Details and Text */
+body.light-theme p,
+body.light-theme .detail-item span,
+body.light-theme .incident-meta,
+body.light-theme .description,
+body.light-theme .activity-description,
+body.light-theme .region-details,
+body.light-theme .toast-message {
+    color: #4B5563 !important;
+}
+
+body.light-theme h1, body.light-theme h2, body.light-theme h3,
+body.light-theme h4, body.light-theme h5, body.light-theme h6,
+body.light-theme strong,
+body.light-theme .detail-item div,
+body.light-theme .incident-title,
+body.light-theme .activity-title,
+body.light-theme .risk-title,
+body.light-theme .section-title h3,
+body.light-theme .toast-title,
+body.light-theme .region-name,
+body.light-theme .alert-title,
+body.light-theme .card-content h3,
+body.light-theme .panel-header h3,
+body.light-theme .emissions-chart-container h4,
+body.light-theme .strategy-name {
+    color: #1F2937 !important;
+}
+
+/* Severity Badges (Operator / General) */
+body.light-theme .sev-critical, body.light-theme .badge-critical { background: #FEE2E2 !important; color: #EF4444 !important; border: 1px solid #FCA5A5 !important; }
+body.light-theme .sev-high, body.light-theme .badge-high { background: #FFEDD5 !important; color: #F97316 !important; border: 1px solid #FDBA74 !important; }
+body.light-theme .sev-medium, body.light-theme .badge-medium { background: #FEF9C3 !important; color: #EAB308 !important; border: 1px solid #FDE047 !important; }
+body.light-theme .sev-low, body.light-theme .badge-low { background: #DCFCE7 !important; color: #22C55E !important; border: 1px solid #86EFAC !important; }
+
+/* Status Badges */
+body.light-theme .status-badge {
+    background: #F3F4F6 !important;
+    color: #4B5563 !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+body.light-theme .score-circle::before {
+    background: #FFFFFF !important;
+}
+
+/* Inputs & Textareas */
+body.light-theme input,
+body.light-theme textarea,
+body.light-theme select,
+body.light-theme .resource-input-group input[type="number"] {
+    background: #F9FAFB !important;
+    border: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+}
+
+body.light-theme input:focus,
+body.light-theme textarea:focus {
+    background: #FFFFFF !important;
+    border-color: #EF4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* List Items */
+body.light-theme .incident-card,
+body.light-theme .list-item {
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+body.light-theme .incident-card:hover,
+body.light-theme .incident-card.selected,
+body.light-theme .list-item:hover {
+    background: #F3F4F6 !important;
+}
+
+/* Tables */
+body.light-theme table {
+    color: #1F2937 !important;
+}
+body.light-theme th {
+    background: #F8FAFC !important;
+    color: #6B7280 !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+body.light-theme td {
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+/* Alerts */
+body.light-theme .new-alert {
+    background: #FFFFFF !important;
+    color: #1F2937 !important;
+    border: 1px solid #FEE2E2 !important;
+    border-left: 4px solid #EF4444 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+body.light-theme .new-alert h3 {
+    color: #EF4444 !important;
+}
+
+/* Login Page Light Theme Fixes */
+body.light-theme .auth-container {
+    background: #FFFFFF !important;
+    border-color: #E5E7EB !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-theme .brand-header h1 {
+    color: #111827 !important;
+    background: none !important;
+    -webkit-text-fill-color: #111827 !important;
+    text-shadow: none !important;
+}
+
+body.light-theme .brand-header p {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}
+
+body.light-theme .form-section p {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}

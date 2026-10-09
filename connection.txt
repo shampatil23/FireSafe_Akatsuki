@@ -1,0 +1,16 @@
+Emergency Evacuation Plan
+
+Generated: 05/10/2026, 02:35:14
+
+Route: Main Road → Highway 109 → Community Center
+Distance: 2.3 km
+Estimated Time: 8 minutes
+
+Safe Zone: Community Center
+Capacity: 200 people
+Status: Available
+
+Emergency Contacts:
+Fire Department: 101
+Police: 100
+Ambulance: 108

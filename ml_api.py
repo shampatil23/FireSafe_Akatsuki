@@ -345,7 +345,7 @@ def get_model_info():
                 'purpose': 'Spatiotemporal fire risk prediction',
                 'input_features': ['temperature', 'humidity', 'wind_speed', 'wind_direction', 'ndvi', 'elevation', 'slope', 'vegetation_density'],
                 'output': 'Fire risk probability (0-1)',
-                'accuracy': '97.2%'
+                'accuracy': '90%'
             },
             'cellular_automata': {
                 'name': 'CA-based Fire Spread Model',

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><head><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body>
+<canvas id="myChart"></canvas>
+<script>
+const ctx = document.getElementById('myChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: { labels: ['Red', 'Blue'], datasets: [{ label: '# of Votes', data: [12, 19] }] }
+});
+setTimeout(() => {
+    console.log("Chart.instances keys:", Object.keys(Chart.instances));
+}, 100);
+</script>
+</body></html>

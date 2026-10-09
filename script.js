@@ -326,7 +326,12 @@ function initializeMaps() {
         // Simulation Map
         const simulationMapElement = document.getElementById('simulation-map');
         if (simulationMapElement && !simulationMapElement._leaflet_id) {
-            simulationMap = L.map('simulation-map').setView([30.0668, 79.0193], 8);
+            const urlParams = new URLSearchParams(window.location.search);
+            const simLat = parseFloat(urlParams.get('lat')) || 30.0668;
+            const simLng = parseFloat(urlParams.get('lng')) || 79.0193;
+            const autoStart = urlParams.get('autoStart') === 'true';
+
+            simulationMap = L.map('simulation-map').setView([simLat, simLng], autoStart ? 13 : 8);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
@@ -334,8 +339,22 @@ function initializeMaps() {
 
             // Add click listener for fire simulation
             simulationMap.on('click', function(e) {
+                if (typeof fetchLiveWeather === 'function') fetchLiveWeather(e.latlng.lat, e.latlng.lng);
                 startFireSimulation(e.latlng);
             });
+            
+            if (typeof fetchLiveWeather === 'function') {
+                fetchLiveWeather(simLat, simLng);
+            }
+            
+            if (autoStart) {
+                setTimeout(() => {
+                    startFireSimulation({ lat: simLat, lng: simLng });
+                    if (typeof startSimulation === 'function' && typeof isSimulationRunning !== 'undefined' && !isSimulationRunning) {
+                        startSimulation();
+                    }
+                }, 1500);
+            }
 
             // Add forest areas
             addForestAreas();
@@ -1392,6 +1411,34 @@ async function startFireSimulation(latlng) {
     }).addTo(simulationMap);
 
     fireSpreadLayers.push(initialBurn);
+    
+    // Add wind overlay arrow on map if wind data is available
+    const envData = getCurrentEnvironmentalData();
+    if (envData && envData.wind_direction !== undefined) {
+        let wd = envData.wind_direction;
+        if (typeof wd === 'string') {
+            const windDirMap = {'N': 0, 'NE': 45, 'E': 90, 'SE': 135, 'S': 180, 'SW': 225, 'W': 270, 'NW': 315};
+            wd = windDirMap[wd] || 0;
+        }
+        const pushDirection = (wd + 180) % 360;
+        
+        const windOverlay = L.marker([latlng.lat + 0.005, latlng.lng + 0.005], {
+            icon: L.divIcon({
+                className: 'wind-overlay-marker',
+                html: `
+                    <div style="background: rgba(255,255,255,0.8); border: 2px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <i class="fas fa-location-arrow" style="color: #3b82f6; font-size: 1.2rem; transform: rotate(${pushDirection}deg);"></i>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-top: 4px; white-space: nowrap; text-align: center;">
+                        Wind: ${envData.wind_speed} km/h
+                    </div>
+                `,
+                iconSize: [40, 60],
+                iconAnchor: [20, 30]
+            })
+        }).addTo(simulationMap);
+        fireSpreadLayers.push(windOverlay);
+    }
 }
 
 function startSimulation() {
@@ -1566,6 +1613,204 @@ function getElementText(id, defaultValue) {
     return element ? element.textContent : defaultValue;
 }
 
+// ── Active location tracker ── set when user searches a state/district
+let activeLocation = {
+    name: 'Uttarakhand',
+    lat: 30.0668,
+    lng: 79.0193
+};
+
+// Per-state forest fire prediction data (current + next-day)
+const STATE_FIRE_DATA = {
+    'uttarakhand': {
+        current:   [{ name: 'Nainital, Uttarakhand',    risk: 'very-high', percentage: 85 },
+                    { name: 'Almora, Uttarakhand',       risk: 'high',      percentage: 68 },
+                    { name: 'Dehradun, Uttarakhand',     risk: 'moderate',  percentage: 42 }],
+        predicted: [{ name: 'Nainital, Uttarakhand',    risk: 'very-high', percentage: 92 },
+                    { name: 'Pauri Garhwal, Uttarakhand', risk: 'high',    percentage: 74 },
+                    { name: 'Chamoli, Uttarakhand',      risk: 'moderate',  percentage: 55 }],
+        currentZones: [
+            { name: 'Nainital',  coords: [[29.2,79.3],[29.6,79.3],[29.6,79.8],[29.2,79.8]], color: '#ff4444' },
+            { name: 'Almora',   coords: [[29.5,79.5],[29.9,79.5],[29.9,80.0],[29.5,80.0]], color: '#ffa726' },
+            { name: 'Dehradun', coords: [[30.1,77.8],[30.5,77.8],[30.5,78.3],[30.1,78.3]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Nainital',      coords: [[29.1,79.2],[29.7,79.2],[29.7,79.9],[29.1,79.9]], color: '#cc0000' },
+            { name: 'Pauri Garhwal', coords: [[29.8,78.5],[30.4,78.5],[30.4,79.3],[29.8,79.3]], color: '#ff4444' },
+            { name: 'Chamoli',       coords: [[30.2,79.2],[30.7,79.2],[30.7,80.0],[30.2,80.0]], color: '#ffa726' }]
+    },
+    'maharashtra': {
+        current:   [{ name: 'Gadchiroli, Maharashtra',    risk: 'very-high', percentage: 83 },
+                    { name: 'Chandrapur, Maharashtra',    risk: 'high',      percentage: 70 },
+                    { name: 'Nashik, Maharashtra',        risk: 'moderate',  percentage: 45 }],
+        predicted: [{ name: 'Gadchiroli, Maharashtra',   risk: 'very-high', percentage: 90 },
+                    { name: 'Chandrapur, Maharashtra',   risk: 'very-high', percentage: 78 },
+                    { name: 'Nashik, Maharashtra',       risk: 'high',      percentage: 62 },
+                    { name: 'Yavatmal, Maharashtra',     risk: 'moderate',  percentage: 48 }],
+        currentZones: [
+            { name: 'Gadchiroli',  coords: [[19.7,79.9],[20.4,79.9],[20.4,80.7],[19.7,80.7]], color: '#ff4444' },
+            { name: 'Chandrapur', coords: [[19.8,79.2],[20.3,79.2],[20.3,80.0],[19.8,80.0]], color: '#ffa726' },
+            { name: 'Nashik',     coords: [[19.8,73.6],[20.4,73.6],[20.4,74.4],[19.8,74.4]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Gadchiroli',  coords: [[19.5,79.8],[20.6,79.8],[20.6,80.9],[19.5,80.9]], color: '#cc0000' },
+            { name: 'Chandrapur', coords: [[19.6,79.0],[20.4,79.0],[20.4,80.1],[19.6,80.1]], color: '#cc0000' },
+            { name: 'Nashik',     coords: [[19.7,73.5],[20.5,73.5],[20.5,74.5],[19.7,74.5]], color: '#ff4444' },
+            { name: 'Yavatmal',   coords: [[19.8,77.8],[20.4,77.8],[20.4,78.6],[19.8,78.6]], color: '#ffa726' }]
+    },
+    'madhya pradesh': {
+        current:   [{ name: 'Balaghat, Madhya Pradesh',  risk: 'very-high', percentage: 88 },
+                    { name: 'Mandla, Madhya Pradesh',    risk: 'high',      percentage: 72 },
+                    { name: 'Seoni, Madhya Pradesh',     risk: 'moderate',  percentage: 50 }],
+        predicted: [{ name: 'Balaghat, Madhya Pradesh',  risk: 'very-high', percentage: 93 },
+                    { name: 'Mandla, Madhya Pradesh',    risk: 'very-high', percentage: 81 },
+                    { name: 'Seoni, Madhya Pradesh',     risk: 'high',      percentage: 67 },
+                    { name: 'Chhindwara, Madhya Pradesh', risk: 'moderate', percentage: 53 }],
+        currentZones: [
+            { name: 'Balaghat', coords: [[21.5,80.0],[22.2,80.0],[22.2,80.8],[21.5,80.8]], color: '#ff4444' },
+            { name: 'Mandla',   coords: [[22.2,80.3],[22.8,80.3],[22.8,81.0],[22.2,81.0]], color: '#ffa726' },
+            { name: 'Seoni',    coords: [[21.8,79.2],[22.4,79.2],[22.4,80.0],[21.8,80.0]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Balaghat',   coords: [[21.3,79.8],[22.3,79.8],[22.3,81.0],[21.3,81.0]], color: '#cc0000' },
+            { name: 'Mandla',     coords: [[22.0,80.1],[22.9,80.1],[22.9,81.2],[22.0,81.2]], color: '#cc0000' },
+            { name: 'Seoni',      coords: [[21.7,79.0],[22.5,79.0],[22.5,80.1],[21.7,80.1]], color: '#ff4444' },
+            { name: 'Chhindwara', coords: [[21.8,78.6],[22.4,78.6],[22.4,79.4],[21.8,79.4]], color: '#ffa726' }]
+    },
+    'odisha': {
+        current:   [{ name: 'Sundargarh, Odisha',  risk: 'very-high', percentage: 86 },
+                    { name: 'Kandhamal, Odisha',   risk: 'high',      percentage: 68 },
+                    { name: 'Koraput, Odisha',     risk: 'moderate',  percentage: 47 }],
+        predicted: [{ name: 'Sundargarh, Odisha',  risk: 'very-high', percentage: 91 },
+                    { name: 'Kandhamal, Odisha',   risk: 'very-high', percentage: 79 },
+                    { name: 'Koraput, Odisha',     risk: 'high',      percentage: 65 },
+                    { name: 'Keonjhar, Odisha',    risk: 'moderate',  percentage: 52 }],
+        currentZones: [
+            { name: 'Sundargarh', coords: [[21.9,83.8],[22.4,83.8],[22.4,84.5],[21.9,84.5]], color: '#ff4444' },
+            { name: 'Kandhamal', coords:  [[20.0,83.6],[20.7,83.6],[20.7,84.4],[20.0,84.4]], color: '#ffa726' },
+            { name: 'Koraput',   coords:  [[18.5,82.3],[19.2,82.3],[19.2,83.2],[18.5,83.2]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Sundargarh', coords: [[21.7,83.6],[22.6,83.6],[22.6,84.7],[21.7,84.7]], color: '#cc0000' },
+            { name: 'Kandhamal',  coords: [[19.8,83.4],[20.9,83.4],[20.9,84.5],[19.8,84.5]], color: '#cc0000' },
+            { name: 'Koraput',    coords: [[18.3,82.1],[19.4,82.1],[19.4,83.3],[18.3,83.3]], color: '#ff4444' },
+            { name: 'Keonjhar',   coords: [[21.5,85.3],[22.2,85.3],[22.2,86.0],[21.5,86.0]], color: '#ffa726' }]
+    },
+    'chhattisgarh': {
+        current:   [{ name: 'Bastar, Chhattisgarh',   risk: 'very-high', percentage: 84 },
+                    { name: 'Kanker, Chhattisgarh',   risk: 'high',      percentage: 67 },
+                    { name: 'Surguja, Chhattisgarh',  risk: 'moderate',  percentage: 48 }],
+        predicted: [{ name: 'Bastar, Chhattisgarh',   risk: 'very-high', percentage: 90 },
+                    { name: 'Kanker, Chhattisgarh',   risk: 'very-high', percentage: 77 },
+                    { name: 'Surguja, Chhattisgarh',  risk: 'high',      percentage: 64 },
+                    { name: 'Dantewada, Chhattisgarh', risk: 'moderate', percentage: 51 }],
+        currentZones: [
+            { name: 'Bastar',   coords: [[18.6,81.1],[19.4,81.1],[19.4,82.0],[18.6,82.0]], color: '#ff4444' },
+            { name: 'Kanker',   coords: [[20.1,81.4],[20.6,81.4],[20.6,82.0],[20.1,82.0]], color: '#ffa726' },
+            { name: 'Surguja',  coords: [[23.0,83.0],[23.6,83.0],[23.6,83.8],[23.0,83.8]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Bastar',    coords: [[18.3,80.9],[19.6,80.9],[19.6,82.2],[18.3,82.2]], color: '#cc0000' },
+            { name: 'Kanker',    coords: [[19.9,81.2],[20.8,81.2],[20.8,82.2],[19.9,82.2]], color: '#cc0000' },
+            { name: 'Surguja',   coords: [[22.8,82.8],[23.8,82.8],[23.8,83.9],[22.8,83.9]], color: '#ff4444' },
+            { name: 'Dantewada', coords: [[17.8,81.0],[18.4,81.0],[18.4,81.8],[17.8,81.8]], color: '#ffa726' }]
+    },
+    'himachal pradesh': {
+        current:   [{ name: 'Shimla, Himachal Pradesh',  risk: 'high',     percentage: 67 },
+                    { name: 'Kullu, Himachal Pradesh',   risk: 'moderate', percentage: 52 },
+                    { name: 'Kangra, Himachal Pradesh',  risk: 'low',      percentage: 33 }],
+        predicted: [{ name: 'Shimla, Himachal Pradesh',  risk: 'high',     percentage: 74 },
+                    { name: 'Kullu, Himachal Pradesh',   risk: 'high',     percentage: 61 },
+                    { name: 'Kangra, Himachal Pradesh',  risk: 'moderate', percentage: 48 },
+                    { name: 'Mandi, Himachal Pradesh',   risk: 'moderate', percentage: 42 }],
+        currentZones: [
+            { name: 'Shimla',  coords: [[31.0,77.0],[31.4,77.0],[31.4,77.5],[31.0,77.5]], color: '#ffa726' },
+            { name: 'Kullu',   coords: [[31.8,77.0],[32.2,77.0],[32.2,77.5],[31.8,77.5]], color: '#ffd740' },
+            { name: 'Kangra',  coords: [[32.0,76.0],[32.6,76.0],[32.6,76.7],[32.0,76.7]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Shimla', coords: [[30.8,76.8],[31.6,76.8],[31.6,77.7],[30.8,77.7]], color: '#ff4444' },
+            { name: 'Kullu',  coords: [[31.6,76.8],[32.4,76.8],[32.4,77.7],[31.6,77.7]], color: '#ff4444' },
+            { name: 'Kangra', coords: [[31.8,75.8],[32.8,75.8],[32.8,76.8],[31.8,76.8]], color: '#ffa726' },
+            { name: 'Mandi',  coords: [[31.4,76.7],[32.0,76.7],[32.0,77.4],[31.4,77.4]], color: '#ffa726' }]
+    },
+    'kerala': {
+        current:   [{ name: 'Wayanad, Kerala',   risk: 'high',     percentage: 62 },
+                    { name: 'Palakkad, Kerala',  risk: 'moderate', percentage: 48 },
+                    { name: 'Idukki, Kerala',    risk: 'moderate', percentage: 42 }],
+        predicted: [{ name: 'Wayanad, Kerala',   risk: 'high',     percentage: 70 },
+                    { name: 'Palakkad, Kerala',  risk: 'high',     percentage: 58 },
+                    { name: 'Idukki, Kerala',    risk: 'moderate', percentage: 51 },
+                    { name: 'Malappuram, Kerala', risk: 'low',     percentage: 34 }],
+        currentZones: [
+            { name: 'Wayanad',  coords: [[11.5,75.8],[12.0,75.8],[12.0,76.4],[11.5,76.4]], color: '#ffa726' },
+            { name: 'Palakkad', coords: [[10.5,76.4],[11.2,76.4],[11.2,77.2],[10.5,77.2]], color: '#ffd740' },
+            { name: 'Idukki',   coords: [[9.7,76.7],[10.5,76.7],[10.5,77.5],[9.7,77.5]],   color: '#ffd740' }],
+        predictedZones: [
+            { name: 'Wayanad',   coords: [[11.3,75.6],[12.2,75.6],[12.2,76.6],[11.3,76.6]], color: '#ff4444' },
+            { name: 'Palakkad',  coords: [[10.3,76.2],[11.4,76.2],[11.4,77.4],[10.3,77.4]], color: '#ff4444' },
+            { name: 'Idukki',    coords: [[9.5,76.5],[10.6,76.5],[10.6,77.7],[9.5,77.7]],   color: '#ffa726' },
+            { name: 'Malappuram', coords: [[10.8,75.9],[11.5,75.9],[11.5,76.7],[10.8,76.7]], color: '#ffd740' }]
+    },
+    'karnataka': {
+        current:   [{ name: 'Kodagu, Karnataka',          risk: 'high',     percentage: 64 },
+                    { name: 'Uttara Kannada, Karnataka',  risk: 'moderate', percentage: 50 },
+                    { name: 'Chikkamagaluru, Karnataka',  risk: 'moderate', percentage: 44 }],
+        predicted: [{ name: 'Kodagu, Karnataka',          risk: 'high',     percentage: 72 },
+                    { name: 'Uttara Kannada, Karnataka',  risk: 'high',     percentage: 60 },
+                    { name: 'Chikkamagaluru, Karnataka',  risk: 'moderate', percentage: 54 },
+                    { name: 'Belagavi, Karnataka',        risk: 'low',      percentage: 36 }],
+        currentZones: [
+            { name: 'Kodagu',         coords: [[12.0,75.5],[12.7,75.5],[12.7,76.2],[12.0,76.2]], color: '#ffa726' },
+            { name: 'Uttara Kannada', coords: [[14.0,74.3],[15.0,74.3],[15.0,75.3],[14.0,75.3]], color: '#ffd740' },
+            { name: 'Chikkamagaluru', coords: [[13.0,75.5],[13.8,75.5],[13.8,76.4],[13.0,76.4]], color: '#ffd740' }],
+        predictedZones: [
+            { name: 'Kodagu',         coords: [[11.8,75.3],[12.9,75.3],[12.9,76.4],[11.8,76.4]], color: '#ff4444' },
+            { name: 'Uttara Kannada', coords: [[13.8,74.1],[15.2,74.1],[15.2,75.4],[13.8,75.4]], color: '#ff4444' },
+            { name: 'Chikkamagaluru', coords: [[12.8,75.3],[13.9,75.3],[13.9,76.5],[12.8,76.5]], color: '#ffa726' },
+            { name: 'Belagavi',       coords: [[15.5,74.2],[16.3,74.2],[16.3,75.2],[15.5,75.2]], color: '#ffd740' }]
+    },
+    'tamil nadu': {
+        current:   [{ name: 'Nilgiris, Tamil Nadu',    risk: 'high',     percentage: 61 },
+                    { name: 'Dharmapuri, Tamil Nadu',  risk: 'moderate', percentage: 49 },
+                    { name: 'Erode, Tamil Nadu',       risk: 'moderate', percentage: 41 }],
+        predicted: [{ name: 'Nilgiris, Tamil Nadu',    risk: 'high',     percentage: 68 },
+                    { name: 'Dharmapuri, Tamil Nadu',  risk: 'high',     percentage: 58 },
+                    { name: 'Erode, Tamil Nadu',       risk: 'moderate', percentage: 49 },
+                    { name: 'Salem, Tamil Nadu',       risk: 'low',      percentage: 32 }],
+        currentZones: [
+            { name: 'Nilgiris',   coords: [[11.3,76.4],[11.9,76.4],[11.9,77.2],[11.3,77.2]], color: '#ffa726' },
+            { name: 'Dharmapuri', coords: [[11.8,77.6],[12.4,77.6],[12.4,78.4],[11.8,78.4]], color: '#ffd740' },
+            { name: 'Erode',      coords: [[10.9,77.2],[11.5,77.2],[11.5,78.0],[10.9,78.0]], color: '#ffd740' }],
+        predictedZones: [
+            { name: 'Nilgiris',   coords: [[11.1,76.2],[12.1,76.2],[12.1,77.4],[11.1,77.4]], color: '#ff4444' },
+            { name: 'Dharmapuri', coords: [[11.6,77.4],[12.6,77.4],[12.6,78.6],[11.6,78.6]], color: '#ff4444' },
+            { name: 'Erode',      coords: [[10.7,77.0],[11.7,77.0],[11.7,78.2],[10.7,78.2]], color: '#ffa726' },
+            { name: 'Salem',      coords: [[11.4,77.8],[12.0,77.8],[12.0,78.5],[11.4,78.5]], color: '#ffd740' }]
+    },
+    'jharkhand': {
+        current:   [{ name: 'Singhbhum, Jharkhand',  risk: 'very-high', percentage: 80 },
+                    { name: 'Palamu, Jharkhand',     risk: 'high',      percentage: 63 },
+                    { name: 'Hazaribagh, Jharkhand', risk: 'moderate',  percentage: 46 }],
+        predicted: [{ name: 'Singhbhum, Jharkhand',  risk: 'very-high', percentage: 87 },
+                    { name: 'Palamu, Jharkhand',     risk: 'high',      percentage: 73 },
+                    { name: 'Hazaribagh, Jharkhand', risk: 'high',      percentage: 58 },
+                    { name: 'Gumla, Jharkhand',      risk: 'moderate',  percentage: 44 }],
+        currentZones: [
+            { name: 'Singhbhum',  coords: [[22.0,85.5],[22.7,85.5],[22.7,86.3],[22.0,86.3]], color: '#ff4444' },
+            { name: 'Palamu',     coords: [[23.5,83.6],[24.2,83.6],[24.2,84.4],[23.5,84.4]], color: '#ffa726' },
+            { name: 'Hazaribagh', coords: [[23.8,85.0],[24.4,85.0],[24.4,85.8],[23.8,85.8]], color: '#66bb6a' }],
+        predictedZones: [
+            { name: 'Singhbhum',  coords: [[21.8,85.3],[22.9,85.3],[22.9,86.5],[21.8,86.5]], color: '#cc0000' },
+            { name: 'Palamu',     coords: [[23.3,83.4],[24.4,83.4],[24.4,84.6],[23.3,84.6]], color: '#ff4444' },
+            { name: 'Hazaribagh', coords: [[23.6,84.8],[24.6,84.8],[24.6,85.9],[23.6,85.9]], color: '#ff4444' },
+            { name: 'Gumla',      coords: [[23.0,84.3],[23.7,84.3],[23.7,85.1],[23.0,85.1]], color: '#ffa726' }]
+    }
+};
+
+// Helper: find state data from a search query
+function findStateData(query) {
+    const q = query.toLowerCase();
+    for (const [key, data] of Object.entries(STATE_FIRE_DATA)) {
+        if (q.includes(key) || key.includes(q)) return { key, data };
+    }
+    return null;
+}
+
 // Toggle prediction functionality
 function togglePrediction() {
     const btn = document.getElementById('toggle-prediction');
@@ -1583,32 +1828,65 @@ function togglePrediction() {
 }
 
 function showCurrentDayPrediction() {
-    updateRiskZones([
-        { name: 'Nainital District', risk: 'very-high', percentage: 85 },
-        { name: 'Almora District', risk: 'high', percentage: 68 },
-        { name: 'Dehradun District', risk: 'moderate', percentage: 42 }
-    ]);
-
-    updateMapRiskColors('current');
-
-    const lastUpdateElement = document.getElementById('last-update');
-    if (lastUpdateElement) {
-        lastUpdateElement.textContent = '2 minutes ago';
+    const stateData = findStateData(activeLocation.name);
+    if (stateData) {
+        updateRiskZones(stateData.data.current);
+        updateMapRiskColorsFromZones(stateData.data.currentZones, 'current');
+    } else {
+        // Generic fallback using the searched location name
+        updateRiskZones([
+            { name: `${activeLocation.name} North`, risk: 'very-high', percentage: 80 },
+            { name: `${activeLocation.name} Central`, risk: 'high',  percentage: 63 },
+            { name: `${activeLocation.name} South`,  risk: 'moderate', percentage: 44 }
+        ]);
+        updateMapRiskColors('current');
     }
+    const lastUpdateElement = document.getElementById('last-update');
+    if (lastUpdateElement) lastUpdateElement.textContent = '2 minutes ago';
 }
 
 function showNextDayPrediction() {
-    updateRiskZones([
-        { name: 'Nainital District', risk: 'very-high', percentage: 92 },
-        { name: 'Almora District', risk: 'very-high', percentage: 78 },
-        { name: 'Dehradun District', risk: 'high', percentage: 65 }
-    ]);
+    const stateData = findStateData(activeLocation.name);
+    if (stateData) {
+        updateRiskZones(stateData.data.predicted);
+        updateMapRiskColorsFromZones(stateData.data.predictedZones, 'predicted');
+        const lastUpdateElement = document.getElementById('last-update');
+        if (lastUpdateElement) lastUpdateElement.textContent = `Predicted for tomorrow — ${activeLocation.name}`;
+    } else {
+        // Generic fallback
+        updateRiskZones([
+            { name: `${activeLocation.name} North`, risk: 'very-high', percentage: 88 },
+            { name: `${activeLocation.name} Central`, risk: 'high',   percentage: 72 },
+            { name: `${activeLocation.name} South`,   risk: 'high',   percentage: 60 }
+        ]);
+        updateMapRiskColors('predicted');
+        const lastUpdateElement = document.getElementById('last-update');
+        if (lastUpdateElement) lastUpdateElement.textContent = `Predicted for tomorrow — ${activeLocation.name}`;
+    }
+}
 
-    updateMapRiskColors('predicted');
-
-    const lastUpdateElement = document.getElementById('last-update');
-    if (lastUpdateElement) {
-        lastUpdateElement.textContent = 'Predicted for tomorrow';
+// New helper: draw zones from an explicit zone list
+function updateMapRiskColorsFromZones(zones, type) {
+    if (!riskMap) return;
+    riskMap.eachLayer(layer => {
+        if (layer instanceof L.Polygon) riskMap.removeLayer(layer);
+    });
+    const allPolygons = [];
+    zones.forEach(zone => {
+        const polygon = L.polygon(zone.coords, {
+            color: zone.color,
+            fillColor: zone.color,
+            fillOpacity: type === 'predicted' ? 0.55 : 0.4,
+            weight: type === 'predicted' ? 3 : 2,
+            dashArray: type === 'predicted' ? '6, 4' : null
+        }).addTo(riskMap);
+        const prefix = type === 'predicted' ? '📅 Tomorrow: ' : '🔴 Today: ';
+        polygon.bindPopup(`<div style="font-family:sans-serif;min-width:150px"><b>${zone.name}</b><br>${prefix}<b>${(zone.color === '#cc0000' || zone.color === '#8b0000') ? 'VERY HIGH' : zone.color === '#ff4444' ? 'HIGH' : zone.color === '#ffa726' || zone.color === '#ff7043' ? 'MODERATE' : 'LOW'} Risk</b></div>`);
+        allPolygons.push(polygon);
+    });
+    if (allPolygons.length > 0) {
+        const group = L.featureGroup(allPolygons);
+        riskMap.fitBounds(group.getBounds().pad(0.15));
     }
 }
 
@@ -1646,67 +1924,188 @@ function updateMapRiskColors(type) {
         }
     });
 
-    // Define zones based on prediction type
-    const zones = type === 'current' ? [
+    // Current day: focused 3-zone Uttarakhand view
+    const currentZones = [
         {
-            name: 'Nainital District',
+            name: 'Nainital, Uttarakhand',
             coords: [[29.2, 79.3], [29.6, 79.3], [29.6, 79.8], [29.2, 79.8]],
-            risk: 'very-high',
-            color: '#ff4444'
+            risk: 'very-high', color: '#ff4444'
         },
         {
-            name: 'Almora District',
+            name: 'Almora, Uttarakhand',
             coords: [[29.5, 79.5], [29.9, 79.5], [29.9, 80.0], [29.5, 80.0]],
-            risk: 'high',
-            color: '#ffa726'
+            risk: 'high', color: '#ffa726'
         },
         {
-            name: 'Dehradun District',
+            name: 'Dehradun, Uttarakhand',
             coords: [[30.1, 77.8], [30.5, 77.8], [30.5, 78.3], [30.1, 78.3]],
-            risk: 'moderate',
-            color: '#66bb6a'
-        }
-    ] : [
-        {
-            name: 'Nainital District',
-            coords: [[29.2, 79.3], [29.6, 79.3], [29.6, 79.8], [29.2, 79.8]],
-            risk: 'very-high',
-            color: '#cc0000'
-        },
-        {
-            name: 'Almora District',
-            coords: [[29.5, 79.5], [29.9, 79.5], [29.9, 80.0], [29.5, 80.0]],
-            risk: 'very-high',
-            color: '#ff4444'
-        },
-        {
-            name: 'Dehradun District',
-            coords: [[30.1, 77.8], [30.5, 77.8], [30.5, 78.3], [30.1, 78.3]],
-            risk: 'high',
-            color: '#ffa726'
+            risk: 'moderate', color: '#66bb6a'
         }
     ];
 
+    // Next Day Prediction: ALL 28 Indian States — distinct forest fire risk zones
+    const predictedZones = [
+        // === VERY HIGH RISK ===
+        // 1. Madhya Pradesh
+        { name: 'Balaghat, Madhya Pradesh',
+          coords: [[21.4, 79.9], [22.2, 79.9], [22.2, 80.8], [21.4, 80.8]],
+          risk: 'very-high', color: '#8b0000' },
+        // 2. Uttarakhand
+        { name: 'Nainital, Uttarakhand',
+          coords: [[29.1, 79.2], [29.7, 79.2], [29.7, 79.9], [29.1, 79.9]],
+          risk: 'very-high', color: '#8b0000' },
+        // 3. Odisha
+        { name: 'Sundargarh, Odisha',
+          coords: [[21.8, 83.7], [22.5, 83.7], [22.5, 84.5], [21.8, 84.5]],
+          risk: 'very-high', color: '#8b0000' },
+        // 4. Chhattisgarh
+        { name: 'Bastar, Chhattisgarh',
+          coords: [[18.5, 81.0], [19.4, 81.0], [19.4, 82.0], [18.5, 82.0]],
+          risk: 'very-high', color: '#8b0000' },
+
+        // === HIGH RISK ===
+        // 5. Maharashtra
+        { name: 'Gadchiroli, Maharashtra',
+          coords: [[19.6, 79.9], [20.5, 79.9], [20.5, 80.8], [19.6, 80.8]],
+          risk: 'high', color: '#cc0000' },
+        // 6. Arunachal Pradesh
+        { name: 'West Kameng, Arunachal Pradesh',
+          coords: [[26.8, 91.8], [27.5, 91.8], [27.5, 92.7], [26.8, 92.7]],
+          risk: 'high', color: '#cc0000' },
+        // 7. Manipur
+        { name: 'Senapati, Manipur',
+          coords: [[24.7, 93.8], [25.3, 93.8], [25.3, 94.5], [24.7, 94.5]],
+          risk: 'high', color: '#cc0000' },
+        // 8. Himachal Pradesh
+        { name: 'Shimla, Himachal Pradesh',
+          coords: [[30.9, 76.9], [31.5, 76.9], [31.5, 77.6], [30.9, 77.6]],
+          risk: 'high', color: '#cc0000' },
+        // 9. Jharkhand
+        { name: 'East Singhbhum, Jharkhand',
+          coords: [[22.0, 85.5], [22.7, 85.5], [22.7, 86.3], [22.0, 86.3]],
+          risk: 'high', color: '#cc0000' },
+        // 10. Andhra Pradesh
+        { name: 'Visakhapatnam, Andhra Pradesh',
+          coords: [[17.5, 82.4], [18.3, 82.4], [18.3, 83.3], [17.5, 83.3]],
+          risk: 'high', color: '#cc0000' },
+        // 11. Telangana
+        { name: 'Bhadradri Kothagudem, Telangana',
+          coords: [[17.4, 80.4], [18.1, 80.4], [18.1, 81.2], [17.4, 81.2]],
+          risk: 'high', color: '#cc0000' },
+        // 12. Nagaland
+        { name: 'Zunheboto, Nagaland',
+          coords: [[25.8, 94.2], [26.4, 94.2], [26.4, 94.9], [25.8, 94.9]],
+          risk: 'high', color: '#cc0000' },
+        // 13. Mizoram
+        { name: 'Champhai, Mizoram',
+          coords: [[23.2, 92.8], [23.8, 92.8], [23.8, 93.4], [23.2, 93.4]],
+          risk: 'high', color: '#cc0000' },
+
+        // === MODERATE RISK ===
+        // 14. Kerala
+        { name: 'Wayanad, Kerala',
+          coords: [[11.5, 75.8], [12.1, 75.8], [12.1, 76.4], [11.5, 76.4]],
+          risk: 'moderate', color: '#ff7043' },
+        // 15. Tamil Nadu
+        { name: 'Nilgiris, Tamil Nadu',
+          coords: [[11.2, 76.4], [11.9, 76.4], [11.9, 77.2], [11.2, 77.2]],
+          risk: 'moderate', color: '#ff7043' },
+        // 16. Karnataka
+        { name: 'Kodagu, Karnataka',
+          coords: [[12.0, 75.4], [12.7, 75.4], [12.7, 76.2], [12.0, 76.2]],
+          risk: 'moderate', color: '#ff7043' },
+        // 17. Assam
+        { name: 'Karbi Anglong, Assam',
+          coords: [[25.4, 92.3], [26.2, 92.3], [26.2, 93.2], [25.4, 93.2]],
+          risk: 'moderate', color: '#ff7043' },
+        // 18. Meghalaya
+        { name: 'West Khasi Hills, Meghalaya',
+          coords: [[25.2, 90.8], [25.8, 90.8], [25.8, 91.6], [25.2, 91.6]],
+          risk: 'moderate', color: '#ff7043' },
+        // 19. Uttarakhand (2nd zone)
+        { name: 'Pauri Garhwal, Uttarakhand',
+          coords: [[29.8, 78.5], [30.4, 78.5], [30.4, 79.3], [29.8, 79.3]],
+          risk: 'moderate', color: '#ff7043' },
+        // 20. Himachal Pradesh (2nd zone)
+        { name: 'Kullu, Himachal Pradesh',
+          coords: [[31.7, 76.9], [32.3, 76.9], [32.3, 77.6], [31.7, 77.6]],
+          risk: 'moderate', color: '#ff7043' },
+        // 21. Tripura
+        { name: 'Dhalai, Tripura',
+          coords: [[23.4, 91.7], [24.0, 91.7], [24.0, 92.3], [23.4, 92.3]],
+          risk: 'moderate', color: '#ff7043' },
+        // 22. Sikkim
+        { name: 'West Sikkim',
+          coords: [[27.2, 88.0], [27.7, 88.0], [27.7, 88.5], [27.2, 88.5]],
+          risk: 'moderate', color: '#ff7043' },
+
+        // === LOW RISK ===
+        // 23. Bihar
+        { name: 'West Champaran, Bihar',
+          coords: [[26.8, 84.0], [27.5, 84.0], [27.5, 84.8], [26.8, 84.8]],
+          risk: 'low', color: '#ffd740' },
+        // 24. Uttar Pradesh
+        { name: 'Sonbhadra, Uttar Pradesh',
+          coords: [[24.0, 82.4], [24.7, 82.4], [24.7, 83.2], [24.0, 83.2]],
+          risk: 'low', color: '#ffd740' },
+        // 25. West Bengal
+        { name: 'Jalpaiguri, West Bengal',
+          coords: [[26.3, 88.5], [27.0, 88.5], [27.0, 89.3], [26.3, 89.3]],
+          risk: 'low', color: '#ffd740' },
+        // 26. Rajasthan
+        { name: 'Sawai Madhopur, Rajasthan',
+          coords: [[25.7, 76.1], [26.4, 76.1], [26.4, 76.9], [25.7, 76.9]],
+          risk: 'low', color: '#ffd740' },
+        // 27. Gujarat
+        { name: 'Dangs, Gujarat',
+          coords: [[20.5, 73.4], [21.1, 73.4], [21.1, 73.9], [20.5, 73.9]],
+          risk: 'low', color: '#ffd740' },
+        // 28. Goa
+        { name: 'North Goa',
+          coords: [[15.1, 73.7], [15.6, 73.7], [15.6, 74.2], [15.1, 74.2]],
+          risk: 'low', color: '#ffd740' },
+        // 29. Punjab
+        { name: 'Pathankot, Punjab',
+          coords: [[31.9, 75.4], [32.4, 75.4], [32.4, 76.0], [31.9, 76.0]],
+          risk: 'low', color: '#ffd740' },
+        // 30. Haryana
+        { name: 'Panchkula (Morni Hills), Haryana',
+          coords: [[30.4, 76.9], [30.9, 76.9], [30.9, 77.4], [30.4, 77.4]],
+          risk: 'low', color: '#ffd740' },
+    ];
+
+    const zones = type === 'current' ? currentZones : predictedZones;
+
     // Add updated zones to map
+    const allPolygons = [];
     zones.forEach(zone => {
         const polygon = L.polygon(zone.coords, {
             color: zone.color,
             fillColor: zone.color,
-            fillOpacity: type === 'predicted' ? 0.6 : 0.4,
-            weight: type === 'predicted' ? 3 : 2
+            fillOpacity: type === 'predicted' ? 0.55 : 0.4,
+            weight: type === 'predicted' ? 3 : 2,
+            dashArray: type === 'predicted' ? '6, 4' : null
         }).addTo(riskMap);
 
         const riskLevel = zone.risk.replace('-', ' ').toUpperCase();
-        const prefix = type === 'predicted' ? 'Predicted: ' : '';
+        const prefix = type === 'predicted' ? '📅 Predicted Tomorrow: ' : '🔴 Current: ';
 
         polygon.bindPopup(`
-            <div>
-                <h4>${zone.name}</h4>
-                <p>${prefix}Risk Level: ${riskLevel}</p>
+            <div style="font-family: sans-serif; min-width: 160px;">
+                <h4 style="margin: 0 0 6px; font-size: 0.95rem;">${zone.name}</h4>
+                <p style="margin: 0; font-size: 0.85rem;">${prefix}<strong>${riskLevel}</strong></p>
             </div>
         `);
+        allPolygons.push(polygon);
     });
+
+    // Auto-fit map to show ALL prediction zones
+    if (allPolygons.length > 0) {
+        const group = L.featureGroup(allPolygons);
+        riskMap.fitBounds(group.getBounds().pad(0.1));
+    }
 }
+
 
 // Enhanced Search Functionality with expanded location database
 function initializeMapSearch() {
@@ -1970,7 +2369,14 @@ function initializeMapSearch() {
         
         // Update risk zones for the new location
         if (riskMap && updatedMaps > 0) {
+            // Track the active location so Next Day Prediction is state-aware
+            activeLocation = { name: query, lat: lat, lng: lng };
             updateRiskZonesForLocation(query, lat, lng);
+            
+            // Immediately fetch real weather for the new location
+            if (typeof updateEnvironmentalData === 'function') {
+                updateEnvironmentalData();
+            }
         }
         
         return updatedMaps;
@@ -2221,6 +2627,9 @@ let explainabilityMap = null;
 
 // Start real-time data updates
 function startDataUpdates() {
+    // Initial fetches so we don't have to wait for the first interval
+    updateEnvironmentalData();
+    
     setInterval(updateEnvironmentalData, 30000);
     setInterval(updateAlerts, 60000);
     setInterval(updateTimeStamps, 60000);
@@ -2230,18 +2639,53 @@ function startDataUpdates() {
     setInterval(updateEnvironmentalConditions, 35000);
 }
 
-function updateEnvironmentalData() {
-    const windSpeed = Math.floor(Math.random() * 20) + 5;
-    const temperature = Math.floor(Math.random() * 15) + 25;
-    const humidity = Math.floor(Math.random() * 40) + 30;
+async function updateEnvironmentalData() {
+    let lat = 18.5204; // Default to Pune
+    let lng = 73.8567;
+    
+    // If user has searched a location, use its coordinates
+    if (typeof activeLocation !== 'undefined' && activeLocation && activeLocation.lat && activeLocation.lng) {
+        lat = activeLocation.lat;
+        lng = activeLocation.lng;
+    }
 
-    updateElementText('wind-speed', `${windSpeed} km/h`);
-    updateElementText('temperature', `${temperature}°C`);
-    updateElementText('humidity', `${humidity}%`);
+    try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m`);
+        const data = await response.json();
+        
+        if (data && data.current) {
+            const windSpeed = Math.round(data.current.wind_speed_10m);
+            const temperature = Math.round(data.current.temperature_2m);
+            const humidity = Math.round(data.current.relative_humidity_2m);
+            const windDirDegrees = data.current.wind_direction_10m;
+            
+            // Convert degrees to cardinal direction
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const dirIndex = Math.round(((windDirDegrees %= 360) < 0 ? windDirDegrees + 360 : windDirDegrees) / 45) % 8;
+            const windDirection = directions[dirIndex];
 
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-    updateElementText('wind-direction', randomDirection);
+            updateElementText('wind-speed', `${windSpeed} km/h`);
+            updateElementText('temperature', `${temperature}°C`);
+            updateElementText('humidity', `${humidity}%`);
+            updateElementText('wind-direction', windDirection);
+            
+            // Show a tiny 'LIVE' indicator next to temperature if we want, or just leave it
+        }
+    } catch (error) {
+        console.error("Failed to fetch real weather data, using simulation:", error);
+        // Fallback to simulation
+        const windSpeed = Math.floor(Math.random() * 20) + 5;
+        const temperature = Math.floor(Math.random() * 15) + 25;
+        const humidity = Math.floor(Math.random() * 40) + 30;
+
+        updateElementText('wind-speed', `${windSpeed} km/h`);
+        updateElementText('temperature', `${temperature}°C`);
+        updateElementText('humidity', `${humidity}%`);
+
+        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        updateElementText('wind-direction', randomDirection);
+    }
 }
 
 function updateElementText(id, text) {
@@ -2456,7 +2900,158 @@ async function updateMLPredictions() {
     }
 }
 
+let liveWeatherData = null;
+let lastWeatherFetchTime = 0;
+let weatherInterval = null;
+
+async function fetchLiveWeather(lat, lng) {
+    if (!lat || !lng) return null;
+    const now = Date.now();
+    
+    // Cache for 10 minutes (600,000 ms)
+    if (liveWeatherData && liveWeatherData.lat === lat && liveWeatherData.lng === lng && (now - lastWeatherFetchTime < 600000)) {
+        return liveWeatherData;
+    }
+    
+    const weatherLoading = document.getElementById('weather-loading');
+    const weatherContent = document.getElementById('weather-content');
+    const timestampEl = document.getElementById('weather-timestamp');
+    
+    if (weatherLoading) weatherLoading.style.display = 'block';
+    if (weatherContent) weatherContent.style.opacity = '0.5';
+    
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kmh&timezone=auto`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Weather API error');
+        const data = await res.json();
+        
+        liveWeatherData = {
+            lat: lat,
+            lng: lng,
+            temperature: data.current.temperature_2m,
+            humidity: data.current.relative_humidity_2m,
+            precipitation: data.current.precipitation,
+            wind_speed: data.current.wind_speed_10m,
+            wind_direction: data.current.wind_direction_10m,
+            wind_gusts: data.current.wind_gusts_10m,
+            hourly: data.hourly
+        };
+        lastWeatherFetchTime = now;
+        
+        updateWeatherPanelUI();
+    } catch (e) {
+        console.warn('Failed to fetch weather:', e);
+        if (liveWeatherData && timestampEl) {
+            timestampEl.innerText = `Updated: ${new Date(lastWeatherFetchTime).toLocaleTimeString()} (Cached/Stale)`;
+        } else if (timestampEl) {
+            timestampEl.innerText = 'Weather fetch failed.';
+        }
+    } finally {
+        if (weatherLoading) weatherLoading.style.display = 'none';
+        if (weatherContent) weatherContent.style.opacity = '1';
+    }
+    return liveWeatherData;
+}
+
+function updateWeatherPanelUI() {
+    if (!liveWeatherData) return;
+    
+    const setElem = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    
+    setElem('live-temperature', `${liveWeatherData.temperature} °C`);
+    setElem('live-humidity', `${liveWeatherData.humidity} %`);
+    setElem('live-wind-speed', `${liveWeatherData.wind_speed} km/h`);
+    setElem('live-wind-gusts', `${liveWeatherData.wind_gusts} km/h`);
+    setElem('live-precipitation', `${liveWeatherData.precipitation} mm`);
+    
+    setElem('live-wind-direction', `${liveWeatherData.wind_direction}°`);
+    const arrow = document.getElementById('live-wind-arrow');
+    if (arrow) arrow.style.transform = `rotate(${liveWeatherData.wind_direction}deg)`;
+    
+    setElem('weather-timestamp', `Updated: ${new Date(lastWeatherFetchTime).toLocaleTimeString()}`);
+    setElem('weather-location', `${liveWeatherData.lat.toFixed(4)}, ${liveWeatherData.lng.toFixed(4)}`);
+    
+    const hourlyContainer = document.getElementById('hourly-forecast-container');
+    if (hourlyContainer && liveWeatherData.hourly) {
+        hourlyContainer.innerHTML = '';
+        // Find current hour index
+        const currentIso = new Date().toISOString().slice(0, 13) + ':00'; // e.g., 2026-10-09T22:00
+        let startIndex = 0;
+        if (liveWeatherData.hourly.time) {
+            for (let i = 0; i < liveWeatherData.hourly.time.length; i++) {
+                if (new Date(liveWeatherData.hourly.time[i]).getTime() >= Date.now() - 3600000) {
+                    startIndex = i;
+                    break;
+                }
+            }
+            
+            for (let i = startIndex; i < startIndex + 12 && i < liveWeatherData.hourly.time.length; i++) {
+                const timeStr = new Date(liveWeatherData.hourly.time[i]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const ws = liveWeatherData.hourly.wind_speed_10m[i];
+                const wd = liveWeatherData.hourly.wind_direction_10m[i];
+                
+                hourlyContainer.innerHTML += `
+                    <div style="min-width: 60px; background: #f8fafc; padding: 6px; border-radius: 4px; text-align: center; font-size: 0.7rem;">
+                        <div style="color: #64748b; margin-bottom: 4px;">${timeStr}</div>
+                        <div style="font-weight: 600;">${ws}</div>
+                        <div style="color: #94a3b8; font-size: 0.65rem;">km/h</div>
+                        <i class="fas fa-location-arrow" style="color: #3b82f6; transform: rotate(${wd}deg); margin-top: 4px;"></i>
+                    </div>
+                `;
+            }
+        }
+    }
+    
+    // Update the simulation parameters UI to reflect these if possible
+    const tempParam = document.getElementById('temperature');
+    if (tempParam) tempParam.innerText = `${liveWeatherData.temperature}°C`;
+    const humParam = document.getElementById('humidity');
+    if (humParam) humParam.innerText = `${liveWeatherData.humidity}%`;
+    const wsParam = document.getElementById('wind-speed');
+    if (wsParam) wsParam.innerText = `${liveWeatherData.wind_speed} km/h`;
+    const wdParam = document.getElementById('wind-direction');
+    if (wdParam) wdParam.innerText = `${liveWeatherData.wind_direction}°`;
+}
+
+// Global button listener
+document.addEventListener('DOMContentLoaded', () => {
+    const refreshBtn = document.getElementById('refresh-weather-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            if (liveWeatherData) {
+                lastWeatherFetchTime = 0; // force refresh
+                fetchLiveWeather(liveWeatherData.lat, liveWeatherData.lng);
+            }
+        });
+    }
+    
+    // Setup interval for weather 10 min
+    if (document.getElementById('weather-panel')) {
+        weatherInterval = setInterval(() => {
+            if (document.visibilityState === 'visible' && liveWeatherData) {
+                fetchLiveWeather(liveWeatherData.lat, liveWeatherData.lng);
+            }
+        }, 600000);
+    }
+});
+
 function getCurrentEnvironmentalData() {
+    const useLive = document.getElementById('use-live-weather');
+    if (useLive && useLive.checked && liveWeatherData) {
+        return {
+            temperature: liveWeatherData.temperature,
+            humidity: liveWeatherData.humidity,
+            wind_speed: liveWeatherData.wind_speed,
+            wind_direction: liveWeatherData.wind_direction,
+            ndvi: 0.6 + (Math.random() - 0.5) * 0.2,
+            elevation: 1500 + Math.random() * 500,
+            slope: 10 + Math.random() * 20,
+            vegetation_density: 'moderate',
+            hourly_forecast: liveWeatherData.hourly
+        };
+    }
+    
     const temperature = getElementValue('temperature', 32);
     const humidity = getElementValue('humidity', 45);
     const windSpeed = getElementValue('wind-speed', 15);
@@ -5090,7 +5685,7 @@ class FireVision3D {
 // FireVision API Integration
 class FireVisionAPI {
     constructor() {
-        this.baseURL = window.location.origin.replace(':5000', ':5001');
+        this.baseURL = window.location.origin.replace(':8000', ':5001');
     }
     
     async simulate3D(lat, lng, duration = 6) {
@@ -6424,7 +7019,7 @@ function downloadReport() {
         showToast('Daily risk report downloaded successfully!', 'success');
 
         const link = document.createElement('a');
-        link.href = 'data:text/plain;charset=utf-8,AgniVeer Daily Fire Risk Report\n\nGenerated: ' + new Date().toLocaleString() + '\n\nOverall Risk Level: High\nTotal Monitored Area: 53,483 km²\nActive Sensors: 247\nPrediction Accuracy: 97.2%';
+        link.href = 'data:text/plain;charset=utf-8,AgniVeer Daily Fire Risk Report\n\nGenerated: ' + new Date().toLocaleString() + '\n\nOverall Risk Level: High\nTotal Monitored Area: 53,483 km²\nActive Sensors: 247\nPrediction Accuracy: 89%';
         link.download = 'agniveer-daily-report-' + new Date().toISOString().split('T')[0] + '.txt';
         document.body.appendChild(link);
         link.click();
