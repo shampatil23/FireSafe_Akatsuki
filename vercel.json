@@ -2,15 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "services": {
     "frontend": {
-      "root": "."
+      "root": "public"
     },
     "next-app": {
       "root": "ResQ-AI-main/frontend",
       "framework": "nextjs"
     },
     "ml-api": {
-      "root": "api",
-      "framework": "flask"
+      "root": ".",
+      "framework": "flask",
+      "entrypoint": "api/index.py"
     }
   },
   "rewrites": [
