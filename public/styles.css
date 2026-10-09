@@ -5350,11 +5350,17 @@ body::after {
 /* Enhanced Simulation Layout */
 .simulation-layout {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
     gap: 2rem;
     align-items: start;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+.simulation-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .simulation-container {
@@ -9426,12 +9432,12 @@ body::after {
     }
 
     .simulation-layout {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
 
-    .simulation-container {
-        grid-column: span 2;
+    .simulation-container, .simulation-sidebar {
+        grid-column: span 1;
     }
 }
 

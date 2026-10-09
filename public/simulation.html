@@ -132,155 +132,157 @@
                     </div>
                 </div>
             </div>
-            <div class="simulation-monitoring">
-                <h3>Real-time Simulation Monitoring</h3>
-                <p class="chart-description">Live tracking of fire spread metrics during active simulation</p>
-                <div class="monitoring-chart-container">
-                    <canvas id="simulationMonitoringChart"></canvas>
-                </div>
-                <div class="monitoring-stats">
-                    <div class="monitoring-stat">
-                        <span class="stat-label">Total Area Burned</span>
-                        <span class="stat-value" id="totalBurnedArea">0 ha</span>
+            <div class="simulation-sidebar">
+                <div class="simulation-monitoring">
+                    <h3>Real-time Simulation Monitoring</h3>
+                    <p class="chart-description">Live tracking of fire spread metrics during active simulation</p>
+                    <div class="monitoring-chart-container">
+                        <canvas id="simulationMonitoringChart"></canvas>
                     </div>
-                    <div class="monitoring-stat">
-                        <span class="stat-label">Fire Perimeter</span>
-                        <span class="stat-value" id="firePerimeter">0 km</span>
-                    </div>
-                    <div class="monitoring-stat">
-                        <span class="stat-label">Spread Rate</span>
-                        <span class="stat-value" id="spreadRate">0 ha/hr</span>
-                    </div>
-                    <div class="monitoring-stat">
-                        <span class="stat-label">Active Fire Sources</span>
-                        <span class="stat-value" id="activeFireSources">0</span>
-                    </div>
-                </div>
-            </div>
-            <div class="weather-panel" id="weather-panel" style="background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem;"><i class="fas fa-cloud-sun" style="color: #f97316; margin-right: 8px;"></i>Live Weather</h3>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span id="weather-location" style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Default Location</span>
-                        <button id="refresh-weather-btn" style="background: none; border: none; cursor: pointer; color: #3b82f6;" title="Refresh Weather">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="weather-loading" style="display: none; text-align: center; padding: 20px 0; color: #64748b;">
-                    <i class="fas fa-spinner fa-spin"></i> Fetching real-time weather...
-                </div>
-
-                <div id="weather-content">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;">
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Speed</div>
-                            <div style="font-weight: 600; color: #0f172a;" id="live-wind-speed">-- km/h</div>
+                    <div class="monitoring-stats">
+                        <div class="monitoring-stat">
+                            <span class="stat-label">Total Area Burned</span>
+                            <span class="stat-value" id="totalBurnedArea">0 ha</span>
                         </div>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Direction</div>
-                            <div style="font-weight: 600; color: #0f172a; display: flex; align-items: center; gap: 5px;">
-                                <span id="live-wind-direction">--</span>
-                                <i class="fas fa-location-arrow" id="live-wind-arrow" style="color: #3b82f6; transform: rotate(0deg);"></i>
+                        <div class="monitoring-stat">
+                            <span class="stat-label">Fire Perimeter</span>
+                            <span class="stat-value" id="firePerimeter">0 km</span>
+                        </div>
+                        <div class="monitoring-stat">
+                            <span class="stat-label">Spread Rate</span>
+                            <span class="stat-value" id="spreadRate">0 ha/hr</span>
+                        </div>
+                        <div class="monitoring-stat">
+                            <span class="stat-label">Active Fire Sources</span>
+                            <span class="stat-value" id="activeFireSources">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="weather-panel" id="weather-panel" style="background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem;"><i class="fas fa-cloud-sun" style="color: #f97316; margin-right: 8px;"></i>Live Weather</h3>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="weather-location" style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Default Location</span>
+                            <button id="refresh-weather-btn" style="background: none; border: none; cursor: pointer; color: #3b82f6;" title="Refresh Weather">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="weather-loading" style="display: none; text-align: center; padding: 20px 0; color: #64748b;">
+                        <i class="fas fa-spinner fa-spin"></i> Fetching real-time weather...
+                    </div>
+
+                    <div id="weather-content">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;">
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Speed</div>
+                                <div style="font-weight: 600; color: #0f172a;" id="live-wind-speed">-- km/h</div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Direction</div>
+                                <div style="font-weight: 600; color: #0f172a; display: flex; align-items: center; gap: 5px;">
+                                    <span id="live-wind-direction">--</span>
+                                    <i class="fas fa-location-arrow" id="live-wind-arrow" style="color: #3b82f6; transform: rotate(0deg);"></i>
+                                </div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Gusts</div>
+                                <div style="font-weight: 600; color: #0f172a;" id="live-wind-gusts">-- km/h</div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Temperature</div>
+                                <div style="font-weight: 600; color: #0f172a;" id="live-temperature">-- °C</div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Rel. Humidity</div>
+                                <div style="font-weight: 600; color: #0f172a;" id="live-humidity">-- %</div>
+                            </div>
+                            <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
+                                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Precipitation</div>
+                                <div style="font-weight: 600; color: #0f172a;" id="live-precipitation">-- mm</div>
                             </div>
                         </div>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Wind Gusts</div>
-                            <div style="font-weight: 600; color: #0f172a;" id="live-wind-gusts">-- km/h</div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">
+                            <span id="weather-timestamp">Updated: --</span>
+                            <a href="https://open-meteo.com/" target="_blank" style="color: #94a3b8; text-decoration: none;">Weather data by Open-Meteo</a>
                         </div>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Temperature</div>
-                            <div style="font-weight: 600; color: #0f172a;" id="live-temperature">-- °C</div>
+                        
+                        <div style="margin-top: 15px; margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 8px;">Wind Forecast (Next 12 Hours)</div>
+                            <div id="hourly-forecast-container" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+                                <!-- Hourly blocks will go here -->
+                            </div>
                         </div>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Rel. Humidity</div>
-                            <div style="font-weight: 600; color: #0f172a;" id="live-humidity">-- %</div>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                            <label for="use-live-weather" style="font-size: 0.85rem; font-weight: 500; color: #334155; cursor: pointer;">Use Current Wind Conditions</label>
+                            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                                <input type="checkbox" id="use-live-weather" checked style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 20px;">
+                                    <span class="knob" style="position: absolute; content: ''; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                                </span>
+                            </label>
                         </div>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px;">
-                            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Precipitation</div>
-                            <div style="font-weight: 600; color: #0f172a;" id="live-precipitation">-- mm</div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">
-                        <span id="weather-timestamp">Updated: --</span>
-                        <a href="https://open-meteo.com/" target="_blank" style="color: #94a3b8; text-decoration: none;">Weather data by Open-Meteo</a>
-                    </div>
-                    
-                    <div style="margin-top: 15px; margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 8px;">Wind Forecast (Next 12 Hours)</div>
-                        <div id="hourly-forecast-container" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
-                            <!-- Hourly blocks will go here -->
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-                        <label for="use-live-weather" style="font-size: 0.85rem; font-weight: 500; color: #334155; cursor: pointer;">Use Current Wind Conditions</label>
-                        <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-                            <input type="checkbox" id="use-live-weather" checked style="opacity: 0; width: 0; height: 0;">
-                            <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 20px;">
-                                <span class="knob" style="position: absolute; content: ''; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;"></span>
-                            </span>
-                        </label>
                     </div>
                 </div>
-            </div>
-            <div class="parameters-panel">
-                <h3>Environmental Parameters</h3>
-                <div class="parameter-grid">
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-wind"></i>
+                <div class="parameters-panel">
+                    <h3>Environmental Parameters</h3>
+                    <div class="parameter-grid">
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Wind Speed</span>
+                                <span class="parameter-value" id="wind-speed">15 km/h</span>
+                            </div>
                         </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Wind Speed</span>
-                            <span class="parameter-value" id="wind-speed">15 km/h</span>
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Wind Direction</span>
+                                <span class="parameter-value" id="wind-direction">NE</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-compass"></i>
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-thermometer-half"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Temperature</span>
+                                <span class="parameter-value" id="temperature">32°C</span>
+                            </div>
                         </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Wind Direction</span>
-                            <span class="parameter-value" id="wind-direction">NE</span>
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Humidity</span>
+                                <span class="parameter-value" id="humidity">45%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-thermometer-half"></i>
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Terrain Slope</span>
+                                <span class="parameter-value" id="terrain-slope">12°</span>
+                            </div>
                         </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Temperature</span>
-                            <span class="parameter-value" id="temperature">32°C</span>
-                        </div>
-                    </div>
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-tint"></i>
-                        </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Humidity</span>
-                            <span class="parameter-value" id="humidity">45%</span>
-                        </div>
-                    </div>
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-mountain"></i>
-                        </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Terrain Slope</span>
-                            <span class="parameter-value" id="terrain-slope">12°</span>
-                        </div>
-                    </div>
-                    <div class="parameter-item">
-                        <div class="parameter-icon">
-                            <i class="fas fa-tree"></i>
-                        </div>
-                        <div class="parameter-info">
-                            <span class="parameter-label">Vegetation Density</span>
-                            <span class="parameter-value" id="vegetation-density">Dense</span>
+                        <div class="parameter-item">
+                            <div class="parameter-icon">
+                                <i class="fas fa-tree"></i>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="parameter-label">Vegetation Density</span>
+                                <span class="parameter-value" id="vegetation-density">Dense</span>
+                            </div>
                         </div>
                     </div>
                 </div>
