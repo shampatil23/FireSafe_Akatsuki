@@ -1,6 +1,6 @@
 env310/
 *.py
-!ml_api.py
-!ml_models.py
+!api/index.py
+!api/ml_models.py
 !seed*.py
 .DS_Store
