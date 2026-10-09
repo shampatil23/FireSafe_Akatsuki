@@ -1,0 +1,38 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": ".",
+      "framework": null
+    },
+    "next-app": {
+      "root": "ResQ-AI-main/frontend",
+      "framework": "nextjs"
+    },
+    "ml-api": {
+      "root": ".",
+      "framework": "flask",
+      "entrypoint": "ml_api.py"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "ml-api"
+      }
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": {
+        "service": "next-app"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
+  ]
+}

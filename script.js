@@ -9,7 +9,7 @@ let fireSpreadLayers = [];
 let deploymentLayers = [];
 
 // ML API endpoints
-const ML_API_BASE = `${window.location.protocol}//${window.location.hostname}:5001`;
+const ML_API_BASE = "";
 let mlPredictions = {};
 let realTimeUpdates = false;
 let currentOptimization = null;
@@ -5685,7 +5685,7 @@ class FireVision3D {
 // FireVision API Integration
 class FireVisionAPI {
     constructor() {
-        this.baseURL = window.location.origin.replace(':8000', ':5001');
+        this.baseURL = "";
     }
     
     async simulate3D(lat, lng, duration = 6) {
@@ -8780,7 +8780,7 @@ async function runQuantumOptimization() {
     showToast('⚛ Initializing QAOA quantum circuit...', 'processing', 3000);
 
     try {
-        const response = await fetch('http://localhost:5001/api/quantum/optimize', {
+        const response = await fetch('/api/quantum/optimize', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
