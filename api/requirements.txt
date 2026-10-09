@@ -3,5 +3,5 @@ flask
 flask-cors
 numpy
 twilio
-tensorflow
+tensorflow-cpu
 python-dotenv
