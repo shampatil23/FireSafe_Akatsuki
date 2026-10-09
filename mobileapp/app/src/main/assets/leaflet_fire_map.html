@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>FireSafe Live Map</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body, #map { width: 100%; height: 100%; overflow: hidden; background-color: #f1f2f4; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+        /* Custom Leaflet Controls */
+        .leaflet-control-attribution { font-size: 8px !important; background: rgba(255,255,255,0.7) !important; }
+        .leaflet-bar { border-radius: 8px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important; border: none !important; }
+        .leaflet-bar a { border-radius: 8px !important; border-bottom: none !important; }
+
+        /* User Location Pulse Marker */
+        .user-marker {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+        .user-dot {
+            width: 14px;
+            height: 14px;
+            background: #2563EB;
+            border: 2.5px solid #FFFFFF;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+            z-index: 2;
+        }
+        .user-pulse {
+            width: 24px;
+            height: 24px;
+            background: rgba(37, 99, 235, 0.35);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.6); opacity: 0.9; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Active Fire Hotspot Marker */
+        .fire-marker {
+            position: relative;
+            width: 38px;
+            height: 38px;
+        }
+        .fire-core {
+            width: 26px;
+            height: 26px;
+            background: radial-gradient(circle, #FF2E00 30%, #E65100 80%);
+            border: 2px solid #FFFFFF;
+            border-radius: 50%;
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: white;
+            box-shadow: 0 0 14px rgba(230, 81, 0, 0.8), 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+        .fire-glow {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 77, 0, 0.38);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: fire-pulse 1.6s ease-out infinite;
+        }
+
+        @keyframes fire-pulse {
+            0% { transform: scale(0.7); opacity: 0.9; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+            100% { transform: scale(2.1); opacity: 0; }
+        }
+
+        /* Shelter Marker */
+        .shelter-marker {
+            width: 28px;
+            height: 28px;
+            background: #10B981;
+            border: 2px solid #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+
+        /* Clean Popups */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px !important;
+            padding: 4px 6px !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18) !important;
+            font-family: inherit;
+        }
+        .popup-title { font-weight: 700; font-size: 13px; color: #111; margin-bottom: 2px; }
+        .popup-desc { font-size: 11px; color: #666; line-height: 1.3; }
+        .popup-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 4px; }
+        .badge-extreme { background: #FEE2E2; color: #DC2626; }
+        .badge-safe { background: #D1FAE5; color: #059669; }
+        .badge-warning { background: #FEF3C7; color: #D97706; }
+
+        /* IoT Node Marker Styles */
+        .iot-node-marker {
+            position: relative;
+            width: 32px;
+            height: 32px;
+        }
+        .node-inner {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            z-index: 2;
+        }
+        .node-normal .node-inner { background: #10B981; color: white; }
+        .node-suspicious .node-inner { background: #F59E0B; color: white; }
+        .node-fire .node-inner { background: #EF4444; color: white; }
+
+        .node-pulse-warning {
+            width: 32px;
+            height: 32px;
+            background: rgba(245, 158, 11, 0.4);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: pulse-ring 1.8s infinite;
+        }
+        .node-pulse-fire {
+            width: 32px;
+            height: 32px;
+            background: rgba(239, 68, 68, 0.45);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: pulse-ring 1.2s infinite;
+        }
+
+        /* Offline Fallback Grid */
+        .offline-bg {
+            background-color: #EBF0F5;
+            background-image: linear-gradient(#DFE6ED 1px, transparent 1px), linear-gradient(90deg, #DFE6ED 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+<body class="offline-bg">
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        var map = null;
+        var userLayer = null;
+        var fireLayer = null;
+        var nodesLayer = null;
+        var zonesLayer = null;
+        var gatewaysLayer = null;
+        var sheltersLayer = null;
+        var routeLayer = null;
+        var riskPolygonsLayer = null;
+        var isInteractiveMode = true;
+
+        function initMap(initialLat, initialLng, zoom, interactive) {
+            isInteractiveMode = interactive !== false;
+
+            try {
+                map = L.map('map', {
+                    center: [initialLat || 18.5204, initialLng || 73.8567],
+                    zoom: zoom || 13,
+                    zoomControl: isInteractiveMode,
+                    dragging: isInteractiveMode,
+                    touchZoom: isInteractiveMode,
+                    scrollWheelZoom: isInteractiveMode,
+                    doubleClickZoom: isInteractiveMode,
+                    boxZoom: isInteractiveMode,
+                    attributionControl: false
+                });
+
+                // Real OpenStreetMap Tile Layer matching FireSafe Web App
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors',
+                    subdomains: ['a', 'b', 'c']
+                }).addTo(map);
+
+                // Layer groups
+                userLayer = L.layerGroup().addTo(map);
+                fireLayer = L.layerGroup().addTo(map);
+                nodesLayer = L.layerGroup().addTo(map);
+                zonesLayer = L.layerGroup().addTo(map);
+                gatewaysLayer = L.layerGroup().addTo(map);
+                sheltersLayer = L.layerGroup().addTo(map);
+                routeLayer = L.layerGroup().addTo(map);
+                riskPolygonsLayer = L.layerGroup().addTo(map);
+
+                if (!isInteractiveMode) {
+                    // Preview mode: tap anywhere opens full map
+                    map.on('click', function() {
+                        if (window.AndroidBridge && window.AndroidBridge.onMapClicked) {
+                            window.AndroidBridge.onMapClicked();
+                        }
+                    });
+                }
+
+                if (window.AndroidBridge && window.AndroidBridge.onMapReady) {
+                    window.AndroidBridge.onMapReady();
+                }
+            } catch (err) {
+                console.error("Map initialization error:", err);
+            }
+        }
+
+        function updateMapData(data) {
+            if (!map) return;
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch(e) { return; }
+            }
+
+            // 1. User Location Marker
+            if (data.user) {
+                userLayer.clearLayers();
+                var userIcon = L.divIcon({
+                    className: 'user-marker',
+                    html: '<div class="user-pulse"></div><div class="user-dot"></div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                var userMarker = L.marker([data.user.lat, data.user.lng], { icon: userIcon });
+                userMarker.bindPopup('<div class="popup-title">Your Location</div><div class="popup-desc">' + (data.user.title || 'Current GPS position') + '</div>');
+                userLayer.addLayer(userMarker);
+            }
+
+            // 2. Active Fire Hotspot & Hazard Zone (ONLY if hasFire is true!)
+            if (data.hasFire && data.fire) {
+                fireLayer.clearLayers();
+                var fLat = data.fire.lat;
+                var fLng = data.fire.lng;
+                var radius = data.fire.radius || 1200;
+
+                // Pulsating Flame Pin
+                var fireIcon = L.divIcon({
+                    className: 'fire-marker',
+                    html: '<div class="fire-glow"></div><div class="fire-core">🔥</div>',
+                    iconSize: [38, 38],
+                    iconAnchor: [19, 19]
+                });
+                var fMarker = L.marker([fLat, fLng], { icon: fireIcon });
+                fMarker.bindPopup(
+                    '<div class="popup-title">🔥 Active Wildfire Hotspot</div>' +
+                    '<div class="popup-desc">' + (data.fire.severity || 'HIGH RISK') + ' • ' + (data.fire.distance || '') + '</div>' +
+                    '<div class="popup-desc" style="margin-top:2px;">Est. Spread: ' + (data.fire.spreadRate || '12.4 km² NORTH_EAST') + '</div>' +
+                    '<span class="popup-badge badge-extreme">EVACUATION ADVISORY</span>'
+                );
+                fireLayer.addLayer(fMarker);
+
+                // Thermal Hazard Radius Circle
+                var circle = L.circle([fLat, fLng], {
+                    color: '#EF4444',
+                    fillColor: '#F87171',
+                    fillOpacity: 0.28,
+                    weight: 2,
+                    dashArray: '4, 6',
+                    radius: radius
+                });
+                fireLayer.addLayer(circle);
+
+                // Outer Risk Buffer Zone
+                var outerBuffer = L.circle([fLat, fLng], {
+                    color: '#F97316',
+                    fillColor: '#FB923C',
+                    fillOpacity: 0.12,
+                    weight: 1.5,
+                    radius: radius * 1.7
+                });
+                fireLayer.addLayer(outerBuffer);
+            } else {
+                // ABSOLUTELY NO FIRE - Clear fire layer!
+                fireLayer.clearLayers();
+            }
+
+            // 3. Real IoT Sensor Nodes from Firebase
+            if (data.nodes && data.nodes.length > 0) {
+                nodesLayer.clearLayers();
+                data.nodes.forEach(function(node) {
+                    // If fire hotspot is already rendered at or near this node, do not render a duplicate marker on top
+                    if (data.hasFire && data.fire) {
+                        var dLat = Math.abs(node.lat - data.fire.lat);
+                        var dLng = Math.abs(node.lng - data.fire.lng);
+                        if (dLat < 0.0005 && dLng < 0.0005) {
+                            return; // The pulsating fire flame pin represents this active fire epicenter!
+                        }
+                    }
+
+                    var isFire = data.hasFire && (node.status === 'FIRE_CONFIRMED' || node.status === 'HIGH' || (node.mq === 0 && node.flame === 0));
+                    var isSuspicious = data.hasFire && (node.status === 'SUSPICIOUS' || (node.mq === 0 || node.flame === 0));
+
+                    var iconClass = 'node-normal';
+                    var iconHtml = '🟢';
+                    var badgeText = 'NORMAL';
+                    var badgeClass = 'badge-safe';
+                    var pulseHtml = '';
+
+                    if (isFire) {
+                        iconClass = 'node-fire';
+                        iconHtml = '📡';
+                        badgeText = node.status === 'HIGH' ? 'HIGH RISK SENSOR' : 'FIRE DETECTED';
+                        badgeClass = 'badge-extreme';
+                        pulseHtml = '<div class="node-pulse-fire"></div>';
+                    } else if (isSuspicious) {
+                        iconClass = 'node-suspicious';
+                        iconHtml = '⚠️';
+                        badgeText = 'SUSPICIOUS SENSOR';
+                        badgeClass = 'badge-warning';
+                        pulseHtml = '<div class="node-pulse-warning"></div>';
+                    }
+
+                    var nodeIcon = L.divIcon({
+                        className: 'iot-node-marker ' + iconClass,
+                        html: pulseHtml + '<div class="node-inner">' + iconHtml + '</div>',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+
+                    var nMarker = L.marker([node.lat, node.lng], { icon: nodeIcon });
+                    var popupContent =
+                        '<div class="popup-title">📡 ' + node.name + ' (' + node.id + ')</div>' +
+                        '<span class="popup-badge ' + badgeClass + '">' + badgeText + '</span>' +
+                        '<div style="margin-top:6px; font-size:11px; line-height:1.4;">' +
+                        '<div>🌡️ <b>Temperature:</b> ' + node.temp + ' °C</div>' +
+                        '<div>💧 <b>Humidity:</b> ' + node.humidity + ' %</div>' +
+                        '<div>💨 <b>MQ Smoke:</b> ' + (node.mq === 0 ? '<span style="color:#DC2626;font-weight:700;">DETECTED (0)</span>' : '<span style="color:#059669;font-weight:600;">NORMAL (1)</span>') + '</div>' +
+                        '<div>🔥 <b>Flame:</b> ' + (node.flame === 0 ? '<span style="color:#DC2626;font-weight:700;">DETECTED (0)</span>' : '<span style="color:#059669;font-weight:600;">NORMAL (1)</span>') + '</div>' +
+                        '<div>🎯 <b>Confirmations:</b> ' + (node.confirmationCount || 0) + ' / 3</div>' +
+                        '<div>🤖 <b>Confidence:</b> ' + Math.round((node.confidence || 0) * 100) + '%</div>' +
+                        '</div>';
+
+                    nMarker.bindPopup(popupContent);
+                    nodesLayer.addLayer(nMarker);
+                });
+            } else {
+                nodesLayer.clearLayers();
+            }
+
+            // 4. Affected Zones
+            if (data.hasFire && data.affectedZones && data.affectedZones.length > 0) {
+                zonesLayer.clearLayers();
+                data.affectedZones.forEach(function(zone) {
+                    var zoneCircle = L.circle([zone.lat, zone.lng], {
+                        color: '#DC2626',
+                        fillColor: '#EF4444',
+                        fillOpacity: 0.16,
+                        weight: 2,
+                        dashArray: '5, 5',
+                        radius: zone.radiusMeters || 1400
+                    });
+                    zoneCircle.bindPopup(
+                        '<div class="popup-title">⚠️ Affected Hazard Zone (' + zone.id + ')</div>' +
+                        '<div class="popup-desc">Risk: <b>' + zone.riskLevel + '</b></div>' +
+                        '<div class="popup-desc">Evacuation Radius: ' + ((zone.radiusMeters || 1400) / 1000) + ' km</div>' +
+                        '<div class="popup-desc">Population: ' + (zone.population || 'Monitored') + '</div>'
+                    );
+                    zonesLayer.addLayer(zoneCircle);
+                });
+            } else {
+                zonesLayer.clearLayers();
+            }
+
+            // 5. Mesh Gateways
+            if (data.gateways && data.gateways.length > 0) {
+                gatewaysLayer.clearLayers();
+                data.gateways.forEach(function(gw) {
+                    var gwIcon = L.divIcon({
+                        className: 'gateway-marker',
+                        html: '<div style="background:#4F46E5;border:2px solid #fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);font-size:12px;">📡</div>',
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13]
+                    });
+                    var gMarker = L.marker([gw.lat, gw.lng], { icon: gwIcon });
+                    gMarker.bindPopup(
+                        '<div class="popup-title">📡 ' + gw.name + '</div>' +
+                        '<div class="popup-desc">Status: <b>' + (gw.online ? 'Online' : 'Offline') + '</b></div>' +
+                        '<div class="popup-desc">Connected Nodes: ' + (gw.connectedNodes || 1) + '</div>'
+                    );
+                    gatewaysLayer.addLayer(gMarker);
+                });
+            } else {
+                gatewaysLayer.clearLayers();
+            }
+
+            // 6. Safe Shelters (Verified Safe Zones Outside Fire Hazard Area)
+            if (data.shelters && data.shelters.length > 0) {
+                sheltersLayer.clearLayers();
+                data.shelters.forEach(function(sh) {
+                    // STRICT FILTER: NEVER display any shelter located inside ANY danger zone!
+                    if (data.hasFire) {
+                        if (data.fire) {
+                            var distToFire = map.distance([sh.lat, sh.lng], [data.fire.lat, data.fire.lng]);
+                            var fireDangerRadius = Math.max((data.fire.radius || 1200) * 1.6, 2000);
+                            if (distToFire <= fireDangerRadius) {
+                                return; // STRICT EXCLUSION: Shelter is inside fire hazard danger zone!
+                            }
+                        }
+                        if (data.affectedZones && data.affectedZones.length > 0) {
+                            for (var zi = 0; zi < data.affectedZones.length; zi++) {
+                                var az = data.affectedZones[zi];
+                                var distToZone = map.distance([sh.lat, sh.lng], [az.lat, az.lng]);
+                                var zoneDangerRadius = (az.radiusMeters || 1400) + 200;
+                                if (distToZone <= zoneDangerRadius) {
+                                    return; // STRICT EXCLUSION: Shelter is inside affected danger zone!
+                                }
+                            }
+                        }
+                    }
+
+                    var shIcon = L.divIcon({
+                        className: 'shelter-marker',
+                        html: '🛡️',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+                    var shMarker = L.marker([sh.lat, sh.lng], { icon: shIcon });
+                    shMarker.bindPopup(
+                        '<div class="popup-title">🛡️ ' + sh.name + '</div>' +
+                        '<div class="popup-desc">Distance: ' + sh.distance + ' km • Beds: ' + (sh.beds || 'Open') + '</div>' +
+                        '<span class="popup-badge badge-safe">✓ VERIFIED SAFE ZONE (OUTSIDE FIRE PERIMETER)</span>'
+                    );
+                    sheltersLayer.addLayer(shMarker);
+
+                    // Add green safe perimeter circle indicating refuge area outside danger zone
+                    var safeCircle = L.circle([sh.lat, sh.lng], {
+                        color: '#059669',
+                        fillColor: '#10B981',
+                        fillOpacity: 0.16,
+                        weight: 2,
+                        dashArray: '3, 4',
+                        radius: 400
+                    });
+                    sheltersLayer.addLayer(safeCircle);
+                });
+            } else {
+                sheltersLayer.clearLayers();
+            }
+
+            // 7. Safe Evacuation Route Polyline
+            if (data.route && data.route.length > 1) {
+                routeLayer.clearLayers();
+                var routeGlow = L.polyline(data.route, {
+                    color: '#34D399',
+                    weight: 8,
+                    opacity: 0.35,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                });
+                routeLayer.addLayer(routeGlow);
+
+                var routeLine = L.polyline(data.route, {
+                    color: '#059669',
+                    weight: 4,
+                    opacity: 0.95,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                });
+                routeLayer.addLayer(routeLine);
+            } else {
+                routeLayer.clearLayers();
+            }
+
+            // 8. Fit Bounds or Pan
+            if (data.fitBounds) {
+                if (data.hasFire && data.fire && data.user) {
+                    var bounds = L.latLngBounds([[data.user.lat, data.user.lng], [data.fire.lat, data.fire.lng]]);
+                    if (data.route && data.route.length > 0) bounds.extend(data.route);
+                    if (data.shelters && data.shelters.length > 0) bounds.extend([data.shelters[0].lat, data.shelters[0].lng]);
+                    map.fitBounds(bounds, { padding: [45, 45], maxZoom: 15 });
+                } else if (data.nodes && data.nodes.length > 0 && data.user) {
+                    var bounds = L.latLngBounds([[data.user.lat, data.user.lng], [data.nodes[0].lat, data.nodes[0].lng]]);
+                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+                } else if (data.user) {
+                    map.setView([data.user.lat, data.user.lng], 13);
+                }
+            } else if (data.center) {
+                map.setView([data.center.lat, data.center.lng], data.center.zoom || 13);
+            }
+        }
+
+        function toggleLayer(layerName, isVisible) {
+            if (!map) return;
+            var target = null;
+            if (layerName === 'hotspots') target = fireLayer;
+            else if (layerName === 'risk') target = zonesLayer || riskPolygonsLayer;
+            else if (layerName === 'shelters') target = sheltersLayer;
+            else if (layerName === 'route') target = routeLayer;
+            else if (layerName === 'nodes') target = nodesLayer;
+            else if (layerName === 'gateways') target = gatewaysLayer;
+
+            if (target) {
+                if (isVisible && !map.hasLayer(target)) map.addLayer(target);
+                else if (!isVisible && map.hasLayer(target)) map.removeLayer(target);
+            }
+        }
+
+        function recenter(lat, lng, zoom) {
+            if (map) {
+                map.flyTo([lat, lng], zoom || 14, { duration: 1.2 });
+            }
+        }
+    </script>
+</body>
+</html>

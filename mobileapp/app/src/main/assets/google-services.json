@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "712111941461",
+    "firebase_url": "https://firesafe-48056-default-rtdb.firebaseio.com",
+    "project_id": "firesafe-48056",
+    "storage_bucket": "firesafe-48056.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712111941461:android:5d0318fa4a0e854def31dc",
+        "android_client_info": {
+          "package_name": "com.diplomates.firesafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "712111941461-7ofbvee3n4gck6f7bio2hnsb65ce1i8m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfcEcc-Hql-S_KWnwPoLqsDFLHBeC1gEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "712111941461-7ofbvee3n4gck6f7bio2hnsb65ce1i8m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

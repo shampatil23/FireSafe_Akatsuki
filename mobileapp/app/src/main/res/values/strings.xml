@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FireSafe</string>
+    <string name="app_tagline">Citizen Emergency &amp; Wildfire Defense</string>
+
+    <!-- Top Bar -->
+    <string name="default_location">Pune, Maharashtra</string>
+    <string name="updated_just_now">Updated just now</string>
+    <string name="notifications">Alerts</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_activity">Alerts</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_account">Account</string>
+
+    <!-- Safety Status -->
+    <string name="status_safe_title">YOU ARE CURRENTLY SAFE</string>
+    <string name="status_safe_subtitle">No active threat detected near your location</string>
+    <string name="status_safe_badge">Safe</string>
+    <string name="status_safe_timestamp">● Safe • Last updated: 12:04 PM</string>
+
+    <string name="status_warning_title">FIRE WATCH: MODERATE</string>
+    <string name="status_warning_subtitle">Elevated dry wind conditions detected. Stay alert.</string>
+    <string name="status_warning_badge">Warning</string>
+
+    <string name="status_high_title">FIRE RISK: HIGH</string>
+    <string name="status_high_subtitle">An active fire has been detected 4.2 km away.</string>
+    <string name="status_high_badge">High Risk</string>
+
+    <string name="status_extreme_title">EVACUATE NOW</string>
+    <string name="status_extreme_subtitle">Active wildfire detected near your location.</string>
+    <string name="status_extreme_badge">EXTREME DANGER</string>
+
+    <!-- Active Fire Alert Card -->
+    <string name="alert_card_title">Fire Alert Nearby</string>
+    <string name="alert_distance_label">Distance</string>
+    <string name="alert_time_label">Detected</string>
+    <string name="alert_direction_label">Direction</string>
+    <string name="alert_spread_label">Est. Spread</string>
+    <string name="alert_action_label">Recommended Action</string>
+    <string name="btn_view_safe_route">View Safe Evacuation Route</string>
+    <string name="btn_view_fire_map">View Fire Map</string>
+    <string name="btn_start_evacuation">START EVACUATION</string>
+
+    <!-- SOS -->
+    <string name="sos_label">SOS</string>
+    <string name="sos_hint_hold">HOLD 3 SEC TO SEND SOS</string>
+    <string name="sos_active_title">EMERGENCY SOS SENT</string>
+    <string name="sos_status_sending">Sending...</string>
+    <string name="sos_status_sent">Sent via High-Priority Gateway</string>
+    <string name="sos_status_sms">SMS fallback dispatched...</string>
+    <string name="sos_status_offline">Offline mesh relay queued...</string>
+    <string name="sos_call_112">Call Emergency 112</string>
+    <string name="sos_cancel">Cancel Emergency Alert</string>
+
+    <!-- Live Fire Map Card -->
+    <string name="map_card_title">Live Fire Map</string>
+    <string name="map_legend_user">You</string>
+    <string name="map_legend_fire">Active Fire</string>
+    <string name="map_legend_high">High Risk</string>
+    <string name="map_legend_extreme">Extreme</string>
+    <string name="map_legend_shelter">Safe Shelter</string>
+    <string name="map_legend_route">Safe Route</string>
+    <string name="btn_open_live_map">Open Live Map</string>
+
+    <!-- Quick Actions -->
+    <string name="qa_shelters_title">SAFE SHELTERS</string>
+    <string name="qa_shelters_desc">Find nearest open shelter</string>
+    <string name="qa_precautions_title">PRECAUTIONS</string>
+    <string name="qa_precautions_desc">What to do during wildfire</string>
+    <string name="qa_offline_title">OFFLINE MAP</string>
+    <string name="qa_offline_desc">Use maps without internet</string>
+    <string name="qa_santhi_title">SANthi AI</string>
+    <string name="qa_santhi_desc">Ask the safety assistant</string>
+
+    <!-- Nearest Shelter Card -->
+    <string name="shelter_card_title">Nearest Safe Shelter</string>
+    <string name="shelter_navigate_cta">Navigate Safely</string>
+    <string name="shelter_verified_open">Verified Open</string>
+    <string name="shelter_capacity_spots">%1$d spots left</string>
+
+    <!-- SANthi Chat -->
+    <string name="santhi_name">SANthi</string>
+    <string name="santhi_subtitle">Your emergency safety assistant</string>
+    <string name="santhi_chip_what_to_do">What should I do now?</string>
+    <string name="santhi_chip_is_safe">Is my area safe?</string>
+    <string name="santhi_chip_nearest_shelter">Where is the nearest shelter?</string>
+    <string name="santhi_chip_how_to_evacuate">How do I evacuate?</string>
+    <string name="santhi_chip_what_to_carry">What should I carry?</string>
+    <string name="santhi_chip_no_internet">What should I do if I have no internet?</string>
+    <string name="santhi_input_hint">Ask SANthi for safety guidance…</string>
+
+    <!-- Offline State -->
+    <string name="offline_banner_title">No Internet Connection</string>
+    <string name="offline_banner_desc">FireSafe is continuing with locally available safety information.</string>
+    <string name="offline_feature_map">Cached map available</string>
+    <string name="offline_feature_alerts">Last known alerts</string>
+    <string name="offline_feature_sos">SOS fallback available</string>
+    <string name="offline_feature_guidance">Offline safety guidance</string>
+
+    <!-- Evacuation Screen -->
+    <string name="evac_screen_title">SAFE EVACUATION</string>
+    <string name="evac_start_navigation">START SAFE NAVIGATION</string>
+    <string name="evac_voice_guidance">Voice Guidance</string>
+    <string name="evac_precaution_note">Stay away from smoke and active fire zones. Keep vehicle windows closed.</string>
+
+    <!-- Account Screen -->
+    <string name="account_profile">Profile &amp; Emergency Medical ID</string>
+    <string name="account_emergency_contacts">Emergency Contacts</string>
+    <string name="account_im_safe">I\'m Safe Check-in</string>
+    <string name="account_im_safe_desc">Send 1-tap SMS &amp; GPS location to family</string>
+    <string name="account_im_safe_broadcast">Broadcast I\'m Safe to Family</string>
+    <string name="account_saved_shelters">Saved Shelters</string>
+    <string name="account_offline_maps">Offline Maps Manager</string>
+    <string name="account_notifications">Alert Notification Preferences</string>
+    <string name="account_location">Location Permissions</string>
+    <string name="account_language">Language (English / हिन्दी / मराठी)</string>
+    <string name="account_support">Emergency Helplines &amp; Support</string>
+    <string name="account_about">About FireSafe Platform</string>
+
+    <!-- Demo / Evaluator Simulation Toolbar -->
+    <string name="simulation_pill_safe">SAFE</string>
+    <string name="simulation_pill_warning">WARNING</string>
+    <string name="simulation_pill_high">HIGH RISK</string>
+    <string name="simulation_pill_extreme">EXTREME RISK</string>
+    <string name="simulation_pill_offline">OFFLINE</string>
+</resources>

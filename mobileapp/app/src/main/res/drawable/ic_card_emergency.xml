@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Outer soft alert glow -->
+    <path
+        android:fillColor="#FFEBEE"
+        android:pathData="M32,6 A26,26 0 1,0 32,58 A26,26 0 1,0 32,6 Z" />
+    <!-- Deep red shield -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M32,12 L18,18 L18,34 C18,44 24,51 32,54 C40,51 46,44 46,34 L46,18 Z" />
+    <!-- White exclamation or flame symbol -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,22 L32,36" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,42 A2.5,2.5 0 1,0 32,42.1 Z" />
+</vector>

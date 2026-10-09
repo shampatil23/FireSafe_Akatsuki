@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutEvacuationRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0E14"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <!-- 1. FULL-SCREEN INTERACTIVE NAVIGATION MAP BACKGROUND -->
+    <com.diplomates.firesafe.ui.custom.InteractiveFireMapView
+        android:id="@+id/evacMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 2. TOP GOOGLE MAPS NAVIGATION HUD -->
+    <LinearLayout
+        android:id="@+id/layoutEvacTopHud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical"
+        android:paddingTop="48dp">
+
+        <!-- Top Maneuver Green Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNavTopBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="#0B8043"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="10dp"
+            app:strokeColor="#137333"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
+
+                    <!-- Maneuver Arrow Icon -->
+                    <ImageView
+                        android:id="@+id/ivNavManeuverIcon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="14dp"
+                        android:contentDescription="Maneuver"
+                        android:src="@drawable/ic_turn_left"
+                        app:tint="#FFFFFF" />
+
+                    <!-- Distance & Turn Text -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvNavDistanceMeters"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:includeFontPadding="false"
+                            android:text="100 m"
+                            android:textColor="#FFFFFF"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:id="@+id/tvNavInstruction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:text="Turn LEFT"
+                            android:textColor="#FFFFFF"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:id="@+id/tvNavStreetName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-medium"
+                            android:maxLines="1"
+                            android:text="onto Sinhagad Valley Safe Corridor"
+                            android:textColor="#E8F5E9"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Voice Sound Guidance Toggle (Speaker) -->
+                    <FrameLayout
+                        android:id="@+id/btnVoiceToggle"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_badge_safe"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/ivVoiceToggleIcon"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Toggle Voice Guidance"
+                            android:src="@drawable/ic_volume_up"
+                            app:tint="#FFFFFF" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- Next Step Preview Strip -->
+                <LinearLayout
+                    android:id="@+id/layoutNavNextPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#074C27"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="7dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="7dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:text="THEN:"
+                        android:textColor="#A5D6A7"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavNextPreview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="Proceed 900 m on Senapati Bapat Rd away from fire"
+                        android:textColor="#E8F5E9"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Threat Avoidance Status Floating Pill -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#F1F8E9"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#A5D6A7"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/tvNavHazardAlert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-bold"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="5dp"
+                android:text="🛡️ AI Safe Bypass Active • Ridge Fire 4.2 km North"
+                android:textColor="#2E7D32"
+                android:textSize="11sp" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- 3. FLOATING QUICK ACTION BUTTONS (Right edge, above bottom sheet) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="216dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!-- Compass / Recenter FAB -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabEvacRecenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="Recenter GPS"
+            app:backgroundTint="#FFFFFF"
+            app:elevation="6dp"
+            app:fabCustomSize="46dp"
+            app:srcCompat="@drawable/ic_compass"
+            app:tint="#1B73E8" />
+
+        <!-- Turn list FAB -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabEvacToggleSteps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="Turn List"
+            app:backgroundTint="#FFFFFF"
+            app:elevation="6dp"
+            app:fabCustomSize="46dp"
+            app:srcCompat="@drawable/ic_nav_services"
+            app:tint="#3C4043" />
+
+        <!-- Quick Emergency SOS Trigger Button during Evacuation -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnEvacQuickSos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Emergency SOS"
+            app:backgroundTint="#D93025"
+            app:elevation="8dp"
+            app:fabCustomSize="46dp"
+            app:srcCompat="@drawable/ic_sos"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- 4. BOTTOM GOOGLE MAPS NAVIGATION HUD TRIP SHEET -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/layoutNavBottomHud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="16dp"
+        app:strokeColor="#E0E0E0"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+            <!-- Sheet Drag Handle Bar -->
+            <View
+                android:layout_width="38dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:background="#DADCE0" />
+
+            <!-- Row 1: Big ETA, Distance, Arrival Time & Close Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvNavEtaMinutes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:includeFontPadding="false"
+                        android:text="8"
+                        android:textColor="#0B8043"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="min"
+                        android:textColor="#0B8043"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavRemainingDist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:fontFamily="sans-serif-bold"
+                        android:text="•  2.4 km"
+                        android:textColor="#5F6368"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tvNavEstimatedArrival"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="sans-serif-bold"
+                        android:text="•  5:10 AM"
+                        android:textColor="#5F6368"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Red Circular Exit / Close Navigation Button -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnBackEvacuation"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FCE8E6"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FAD2CF"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Exit Navigation"
+                        android:src="@drawable/ic_close"
+                        app:tint="#D93025" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Row 2: Destination Safe Shelter info & Buffer Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_shield_check"
+                    app:tint="#0B8043" />
+
+                <TextView
+                    android:id="@+id/tvNavDestinationShelter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-bold"
+                    android:maxLines="1"
+                    android:text="Shivaji Community Safe Hall • Capacity 450"
+                    android:textColor="#202124"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Row 3: Google Maps Navigation Control Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <!-- Realtime Turn Simulation / Next Maneuver Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNavSimulateProgress"
+                    style="@style/Widget.FireSafe.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#0B8043"
+                    android:fontFamily="sans-serif-bold"
+                    android:text="NEXT MANEUVER (100 m)"
+                    android:textSize="13sp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_arrow_forward"
+                    app:iconGravity="textEnd"
+                    app:iconSize="18dp" />
+
+                <!-- Voice Repeat / Turn Guidance Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNavRepeatVoice"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Repeat voice guidance"
+                    android:padding="0dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_volume_up"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="#1B73E8" />
+
+                <!-- Open in Google Maps App External Launch Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenGoogleMaps"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Open in Google Maps App"
+                    android:padding="0dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_nav_map"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="#0B8043" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 5. EXPANDABLE FULL ROUTE TURN-BY-TURN STEPS MODAL SHEET -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/layoutEvacuationStepsModal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="12dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="20dp"
+        app:strokeColor="#DADCE0"
+        app:strokeWidth="1.5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Evacuation Route Instructions"
+                    android:textColor="#202124"
+                    android:textSize="17sp" />
+
+                <ImageView
+                    android:id="@+id/btnCloseStepsModal"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_close"
+                    app:tint="#5F6368" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvEvacuationSteps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:maxHeight="320dp"
+                android:nestedScrollingEnabled="true" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>
