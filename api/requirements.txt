@@ -1,7 +1,5 @@
-
 flask
 flask-cors
 numpy
 twilio
-tensorflow-cpu
 python-dotenv
