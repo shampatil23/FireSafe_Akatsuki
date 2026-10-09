@@ -9,9 +9,8 @@
       "framework": "nextjs"
     },
     "ml-api": {
-      "root": ".",
-      "framework": "flask",
-      "entrypoint": "ml_api.py"
+      "root": "api",
+      "framework": "flask"
     }
   },
   "rewrites": [
