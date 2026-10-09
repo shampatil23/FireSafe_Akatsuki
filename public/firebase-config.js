@@ -14,10 +14,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let db = null;
+let firestore = null;
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-    console.log("Firebase RTDB initialized successfully.");
+    firestore = firebase.firestore();
+    console.log("Firebase RTDB and Firestore initialized successfully.");
 } catch (e) {
     console.error("Firebase Initialization Error (check your config):", e);
 }
