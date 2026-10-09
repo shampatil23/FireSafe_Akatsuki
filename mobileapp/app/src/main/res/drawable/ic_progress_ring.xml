@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Background track circle -->
+    <path
+        android:strokeColor="#EEF2F6"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,8 A24,24 0,1,1 31.9,8" />
+    <!-- Active progress arc (e.g. 2/5 or 4/5) -->
+    <path
+        android:strokeColor="#0066F6"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,8 A24,24 0,0,1 55,38" />
+</vector>

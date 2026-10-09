@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/spacing_md"
+    android:layout_marginEnd="@dimen/spacing_md"
+    android:layout_marginBottom="@dimen/spacing_sm"
+    app:cardCornerRadius="@dimen/card_radius_medium"
+    app:cardElevation="@dimen/card_elevation_subtle"
+    app:strokeColor="@color/border"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvShelterOpenBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_badge_safe"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/shelter_verified_open"
+                android:textColor="@color/safe"
+                android:textSize="@dimen/text_metadata" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvShelterCapacity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="140 spots left"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_metadata" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvShelterName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:fontFamily="sans-serif-black"
+            android:text="Shivaji Community Safe Hall"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_card_heading" />
+
+        <TextView
+            android:id="@+id/tvShelterAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Plot 14, Senapati Bapat Road, Pune"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_body_secondary" />
+
+        <TextView
+            android:id="@+id/tvShelterCoordinates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="📍 GPS: 18.4715° N, 73.8630° E"
+            android:textColor="@color/primary"
+            android:textSize="12sp" />
+
+        <!-- Distance & ETA -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvShelterDistanceEta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="2.4 km • approx 8 mins"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvShelterAmenities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:text="Medical Unit • Clean Water • Generator Backup"
+            android:textColor="@color/text_tertiary"
+            android:textSize="@dimen/text_caption" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNavigateShelter"
+            style="@style/Widget.FireSafe.Button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_secondary"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/shelter_navigate_cta" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

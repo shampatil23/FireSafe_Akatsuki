@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Shadow / lower tag -->
+    <path
+        android:fillColor="#E1BEE7"
+        android:pathData="M16,40 L44,12 L56,24 L28,52 Z" />
+    <!-- Front angled tag -->
+    <path
+        android:fillColor="#311B92"
+        android:pathData="M12,36 L40,8 C42,6 45,6 47,8 L54,15 C56,17 56,20 54,22 L26,50 C24,52 21,52 19,50 L12,43 C10,41 10,38 12,36 Z" />
+    <!-- Tag eyelet hole -->
+    <path
+        android:fillColor="#EDE7F6"
+        android:pathData="M48,15 A2.5,2.5 0,1 0,48 20 A2.5,2.5 0,1 0,48 15 Z" />
+    <!-- Percent symbol -->
+    <!-- Top circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M27,24 A3,3 0,1 0,27 30 A3,3 0,1 0,27 24 Z M27,26 A1,1 0,1 1,27 28 A1,1 0,1 1,27 26 Z" />
+    <!-- Slash -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,20 L39,22 L23,38 L21,36 Z" />
+    <!-- Bottom circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33,30 A3,3 0,1 0,33 36 A3,3 0,1 0,33 30 Z M33,32 A1,1 0,1 1,33 34 A1,1 0,1 1,33 32 Z" />
+</vector>

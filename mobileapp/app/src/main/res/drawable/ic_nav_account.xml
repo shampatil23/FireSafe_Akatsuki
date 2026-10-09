@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- User Avatar Profile Silhouette -->
+    <!-- Head -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12,11 C13.66,11 15,9.66 15,8 C15,6.34 13.66,5 12,5 C10.34,5 9,6.34 9,8 C9,9.66 10.34,11 12,11 Z" />
+    <!-- Shoulders / Torso -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12,13.5 C8.67,13.5 5,15.17 5,18.5 V20 H19 V18.5 C19,15.17 15.33,13.5 12,13.5 Z" />
+</vector>

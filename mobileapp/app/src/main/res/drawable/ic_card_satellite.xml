@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Soft orange radar circle -->
+    <path
+        android:fillColor="#FFF3E0"
+        android:pathData="M32,6 A26,26 0 1,0 32,58 A26,26 0 1,0 32,6 Z" />
+    <!-- Satellite body -->
+    <path
+        android:fillColor="#E65100"
+        android:pathData="M27,27 L37,27 L37,37 L27,37 Z" />
+    <!-- Solar panel left -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M14,28 L23,28 L23,36 L14,36 Z" />
+    <!-- Solar panel right -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M41,28 L50,28 L50,36 L41,36 Z" />
+    <!-- Antenna radar dish -->
+    <path
+        android:strokeColor="#E65100"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,37 L32,46" />
+    <path
+        android:strokeColor="#FF8F00"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M26,48 A8,8 0 0,0 38,48" />
+    <!-- Thermal scan beam waves -->
+    <path
+        android:strokeColor="#FF6D00"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M22,53 A14,14 0 0,0 42,53" />
+</vector>
