@@ -2,8 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "services": {
     "frontend": {
-      "root": ".",
-      "framework": null
+      "root": "."
     },
     "next-app": {
       "root": "ResQ-AI-main/frontend",
