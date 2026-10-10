@@ -114,20 +114,151 @@
         .sensor-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            max-width: 95%;
+            gap: 16px;
+            padding: 20px 24px;
+            max-width: 1600px;
             margin: 0 auto;
+            width: 100%;
+        }
+
+        .sensor-topbar-strip {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+        }
+
+        .node-tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 7px 15px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .node-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .node-tab-btn.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(249, 115, 22, 0.2));
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .sensor-grid-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 1380px) {
+            .sensor-grid-6 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sensor-grid-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .telemetry-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .telemetry-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .telemetry-card .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .telemetry-card .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .telemetry-card .card-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .telemetry-card .card-value {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .telemetry-card .card-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .dashboard-split-row {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-split-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         .sensor-panel {
             background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            flex: 1;
+            backdrop-filter: blur(8px);
         }
 
         .panel-header {
@@ -360,61 +491,231 @@
         </header>
 
         <div class="sensor-container">
-            <!-- Sensor Panel -->
-            <div class="sensor-panel">
-                <div class="panel-header">
-                    <span><i class="fas fa-satellite-dish"></i> Live Field Sensors</span>
+            <!-- Top Controls Strip: Node Selector & Live Connectivity Specs -->
+            <div class="sensor-topbar-strip">
+                <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px; padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.1);">
+                        <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite;"></span>
+                        <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">LORA MESH TELEMETRY</span>
+                    </div>
+                    <!-- Node Switcher Tabs (WF-001, WF-002, WF-003) -->
+                    <div id="nodeTabsContainer" style="display: flex; gap: 8px;">
+                        <button class="node-tab-btn" onclick="selectNode('WF-001')" id="tab-WF-001">
+                            <i class="fas fa-microchip"></i> WF-001
+                        </button>
+                        <button class="node-tab-btn" onclick="selectNode('WF-002')" id="tab-WF-002">
+                            <i class="fas fa-microchip"></i> WF-002
+                        </button>
+                        <button class="node-tab-btn active" onclick="selectNode('WF-003')" id="tab-WF-003">
+                            <i class="fas fa-microchip"></i> WF-003
+                        </button>
+                    </div>
                 </div>
-                <div class="sensor-content" style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; align-items: stretch;">
-                    
-                    <!-- Left Column -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                            <h4 id="nodeNameLabel" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                    <i class="fas fa-thermometer-half" style="color: #ef4444; margin-bottom: 10px; font-size: 2rem;"></i>
-                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorTemp">--°C</div>
-                                    <div style="font-size: 0.9rem; color: #94a3b8;">Temperature</div>
-                                </div>
-                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                    <i class="fas fa-tint" style="color: #3b82f6; margin-bottom: 10px; font-size: 2rem;"></i>
-                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorHum">--%</div>
-                                    <div style="font-size: 0.9rem; color: #94a3b8;">Humidity</div>
-                                </div>
-                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                    <i class="fas fa-wind" style="color: #f59e0b; margin-bottom: 10px; font-size: 2rem;"></i>
-                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorGas">--</div>
-                                    <div style="font-size: 0.9rem; color: #94a3b8;">MQ2 Gas / Smoke</div>
-                                </div>
+
+                <!-- Live Node Metadata Indicators -->
+                <div style="display: flex; align-items: center; gap: 18px; font-size: 0.82rem; color: #94a3b8; flex-wrap: wrap;">
+                    <div><i class="fas fa-tower-broadcast" style="color: #38bdf8; margin-right: 4px;"></i> Gateway: <strong id="metaGateway" style="color: #f1f5f9;">GW-001</strong></div>
+                    <div><i class="fas fa-signal" style="color: #10b981; margin-right: 4px;"></i> Signal: <strong id="metaSignal" style="color: #f1f5f9;">Optimal (0 dBm)</strong></div>
+                    <div><i class="fas fa-route" style="color: #a855f7; margin-right: 4px;"></i> Hops: <strong id="metaHops" style="color: #f1f5f9;">0 Hops (Direct)</strong></div>
+                    <div><i class="fas fa-location-dot" style="color: #f43f5e; margin-right: 4px;"></i> GPS: <strong id="metaGps" style="color: #f1f5f9;">18.4651, 73.8363</strong></div>
+                    <div id="metaStatusBadge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;">HIGH ALERT</div>
+                </div>
+            </div>
+
+            <!-- Complete 6-Sensor Telemetry Grid (Horizontal Row) -->
+            <div class="sensor-grid-6">
+                <!-- 1. Temperature -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                            <i class="fas fa-temperature-three-quarters"></i>
+                        </div>
+                        <span id="sensorTempBadge" class="card-badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">NORMAL</span>
+                    </div>
+                    <div class="card-value" id="sensorTemp">--°C</div>
+                    <div class="card-label">Ambient Temperature</div>
+                </div>
+
+                <!-- 2. Humidity -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <span id="sensorHumBadge" class="card-badge" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">STABLE</span>
+                    </div>
+                    <div class="card-value" id="sensorHum">--%</div>
+                    <div class="card-label">Relative Humidity</div>
+                </div>
+
+                <!-- 3. MQ2 Gas / Smoke -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <span id="sensorGasBadge" class="card-badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">HIGH ALERT</span>
+                    </div>
+                    <div class="card-value" id="sensorGas">--</div>
+                    <div class="card-label">MQ2 Smoke & Gas (PPM)</div>
+                </div>
+
+                <!-- 4. Flame Optical Sensor -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(220, 38, 38, 0.15); color: #dc2626;">
+                            <i class="fas fa-fire-flame-curved"></i>
+                        </div>
+                        <span id="sensorFlameBadge" class="card-badge" style="background: rgba(34, 197, 94, 0.2); color: #86efac;">SAFE</span>
+                    </div>
+                    <div class="card-value" id="sensorFlame">0</div>
+                    <div class="card-label">Optical Flame Sensor</div>
+                </div>
+
+                <!-- 5. Infrared (IR) Sensor -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <span id="sensorIRBadge" class="card-badge" style="background: rgba(34, 197, 94, 0.2); color: #86efac;">CLEAR</span>
+                    </div>
+                    <div class="card-value" id="sensorIR" style="font-size: 1.45rem;">CLEAR</div>
+                    <div class="card-label">IR Optical / Thermal</div>
+                </div>
+
+                <!-- 6. Edge AI Prediction -->
+                <div class="telemetry-card">
+                    <div class="card-head">
+                        <div class="card-icon" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <span id="sensorAIBadge" class="card-badge" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe;">EDGE AI</span>
+                    </div>
+                    <div class="card-value" id="sensorAI" style="font-size: 1.35rem;">NONE (0%)</div>
+                    <div class="card-label">AI Wildfire Prediction</div>
+                </div>
+            </div>
+
+            <!-- Balanced Lower Horizontal Section (460px Left Column + 1fr Right Column) -->
+            <div class="dashboard-split-row">
+                <!-- Left Column: Risk Engine & Node Specs -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Real-Time Risk Assessment Card -->
+                    <div class="sensor-panel" style="padding: 22px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="fas fa-shield-halved" style="color: #ef4444; margin-right: 6px;"></i> Threat Assessment Engine
+                            </h4>
+                            <span id="threatStatusText" style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 4px;">ACTIVE REAL-TIME</span>
+                        </div>
+
+                        <!-- Big Risk Banner -->
+                        <div style="background: rgba(0, 0, 0, 0.25); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.05); text-align: center; margin-bottom: 16px;">
+                            <div id="riskLevelDisplay" style="font-size: 2.2rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 12px; letter-spacing: -0.5px;">
+                                <i class="fas fa-fire"></i> CRITICAL RISK
+                            </div>
+                            <p id="riskReason" style="font-size: 0.92rem; color: #cbd5e1; margin: 8px 0 0 0; line-height: 1.4;">
+                                High gas and smoke concentration detected by node telemetry.
+                            </p>
+                        </div>
+
+                        <!-- Threat Diagnostics Matrix -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; margin-bottom: 16px;">
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Smoke / Gas Level</span>
+                                <strong id="matrixGas" style="color: #ef4444; font-size: 0.95rem;">1739 PPM (Threshold Exceeded)</strong>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Heat Index</span>
+                                <strong id="matrixTemp" style="color: #f59e0b; font-size: 0.95rem;">30.8°C (Elevated)</strong>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Flame Optical</span>
+                                <strong id="matrixFlame" style="color: #10b981; font-size: 0.95rem;">Clear (0)</strong>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">AI Edge Model</span>
+                                <strong id="matrixAI" style="color: #818cf8; font-size: 0.95rem;">None (0% Conf)</strong>
                             </div>
                         </div>
 
-                        <div style="padding: 30px 20px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; text-transform: uppercase;">Real-time Risk Assessment</h4>
-                            <div id="riskLevelDisplay" style="font-size: 3rem; font-weight: 700; color: #10b981; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-                                <i class="fas fa-shield-alt" style="font-size: 4rem;"></i>
-                                <span>LOW RISK</span>
-                            </div>
-                            <p id="riskReason" style="font-size: 1.1rem; color: #94a3b8; margin-top: 20px;">Awaiting sensor data...</p>
+                        <!-- Action Triggers -->
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="triggerEmergencySOS()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.3);">
+                                <i class="fas fa-truck-medical"></i> Dispatch Unit
+                            </button>
+                            <button onclick="pingActiveNode()" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-rotate"></i> Ping Node
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Right Column -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Telemetry Trends</h4>
-                            <canvas id="sensorChart" height="250"></canvas>
-                        </div>
-
-                        <div style="flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Recent Logs</h4>
-                            <div id="sensorLogs" style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 15px; font-family: monospace; font-size: 0.9rem; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 150px; max-height: 250px;">
-                                <div style="color: #94a3b8;">System initialized. Waiting for telemetry...</div>
+                    <!-- Hardware & Network Health Card -->
+                    <div class="sensor-panel" style="padding: 18px 22px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            <i class="fas fa-network-wired" style="color: #38bdf8; margin-right: 6px;"></i> Node Architecture & Health
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">Node Name:</span>
+                                <strong id="specNodeName" style="color: #f1f5f9;">Forest Node 003</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">Hardware ID:</span>
+                                <strong id="specNodeId" style="color: #f1f5f9;">WF-003</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">LoRa Gateway:</span>
+                                <strong id="specGateway" style="color: #38bdf8;">GW-001</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">Mesh Topology:</span>
+                                <strong id="specHops" style="color: #a855f7;">0 Hops (Direct)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">Signal Strength:</span>
+                                <strong id="specSignal" style="color: #10b981;">0 dBm</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span style="color: #94a3b8;">Coordinates:</span>
+                                <strong id="specCoords" style="color: #f43f5e;">18.465, 73.836</strong>
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- Right Column: Telemetry Trends Chart & Real-Time Event Logs -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Telemetry Trends Multi-Sensor Chart -->
+                    <div class="sensor-panel" style="padding: 18px 22px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="fas fa-chart-line" style="color: #f59e0b; margin-right: 6px;"></i> Live Multi-Sensor Telemetry Trends
+                            </h4>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">
+                                <i class="fas fa-circle" style="color: #22c55e; font-size: 0.5rem; margin-right: 4px;"></i> Live LoRa Stream
+                            </div>
+                        </div>
+                        <div style="height: 220px; position: relative;">
+                            <canvas id="sensorChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Event & Telemetry Logs -->
+                    <div class="sensor-panel" style="padding: 18px 22px; flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="fas fa-terminal" style="color: #38bdf8; margin-right: 6px;"></i> Live Telemetry & Node Event Log
+                            </h4>
+                            <button onclick="clearLogs()" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
+                                Clear Console
+                            </button>
+                        </div>
+                        <div id="sensorLogs" style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px 16px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.82rem; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border: 1px solid rgba(255,255,255,0.04);">
+                            <div style="color: #94a3b8;">[BOOT] Telemetry subsystem initialized. Listening to LoRa Mesh...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -481,6 +782,9 @@
     <script>
         // ------------------ SENSOR DASHBOARD LOGIC ------------------
         let sensorChart;
+        let allNodes = {};
+        let activeNodeId = 'WF-003';
+
         const chartData = {
             labels: [],
             datasets: [
@@ -501,6 +805,15 @@
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true
+                },
+                {
+                    label: 'Smoke / Gas (x10 PPM)',
+                    data: [],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [4, 4],
+                    tension: 0.4
                 }
             ]
         };
@@ -514,16 +827,19 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { size: 12 } } }
+                        legend: { 
+                            position: 'top',
+                            labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } } 
+                        }
                     },
                     scales: {
                         x: {
-                            ticks: { color: '#94a3b8', maxTicksLimit: 10, font: { size: 11 } },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
+                            ticks: { color: '#94a3b8', maxTicksLimit: 8, font: { size: 10 } },
+                            grid: { color: 'rgba(255,255,255,0.04)' }
                         },
                         y: {
-                            ticks: { color: '#94a3b8', font: { size: 12 } },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            grid: { color: 'rgba(255,255,255,0.04)' }
                         }
                     }
                 }
@@ -532,101 +848,361 @@
 
         function addLogEntry(message, type = 'info') {
             const logsContainer = document.getElementById('sensorLogs');
-            const color = type === 'alert' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#94a3b8';
+            if (!logsContainer) return;
+            const color = type === 'alert' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#38bdf8';
             const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
             
             const logEl = document.createElement('div');
             logEl.style.color = color;
-            logEl.innerHTML = `<span style="opacity:0.7">[${time}]</span> ${message}`;
+            logEl.innerHTML = `<span style="color: #64748b;">[${time}]</span> <span style="font-weight: 600;">[${type.toUpperCase()}]</span> ${message}`;
             
             logsContainer.insertBefore(logEl, logsContainer.firstChild);
             
-            // keep only last 50
             if (logsContainer.children.length > 50) {
                 logsContainer.removeChild(logsContainer.lastChild);
             }
         }
 
-        function calculateRisk(temp, hum, gas) {
+        function clearLogs() {
+            const logsContainer = document.getElementById('sensorLogs');
+            if (logsContainer) {
+                logsContainer.innerHTML = '<div style="color: #64748b;">[LOGS CLEARED] Listening for new LoRa telemetry...</div>';
+            }
+        }
+
+        function selectNode(nodeId) {
+            activeNodeId = nodeId;
+            
+            // Update active pill button
+            document.querySelectorAll('.node-tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.id === `tab-${nodeId}`);
+            });
+
+            if (allNodes[nodeId]) {
+                updateFullUI(allNodes[nodeId]);
+                addLogEntry(`Switched view to node ${nodeId} (${allNodes[nodeId].name || 'Node'})`, 'info');
+            }
+        }
+
+        function renderNodeTabs() {
+            const container = document.getElementById('nodeTabsContainer');
+            if (!container) return;
+
+            const nodeIds = Object.keys(allNodes);
+            if (nodeIds.length === 0) return;
+
+            container.innerHTML = nodeIds.map(id => {
+                const node = allNodes[id];
+                const isActive = id === activeNodeId;
+                const isOnline = node.online !== false;
+                return `
+                    <button class="node-tab-btn ${isActive ? 'active' : ''}" onclick="selectNode('${id}')" id="tab-${id}">
+                        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${isOnline ? '#22c55e' : '#ef4444'};"></span>
+                        <i class="fas fa-microchip"></i> ${id}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function calculateRisk(temp, hum, gas, flame, ir, aiPred) {
             let risk = 'LOW';
             let color = '#10b981';
-            let icon = 'fa-shield-alt';
-            let reason = 'Normal conditions.';
+            let icon = 'fa-shield-halved';
+            let reason = 'All telemetry values within normal baseline.';
 
-            if (temp > 40 || gas > 400) {
+            const isFlame = (flame > 0);
+            const isIR = (ir === true);
+            const isAIFire = (aiPred && aiPred.toLowerCase().includes('fire'));
+
+            if (isFlame || temp > 50 || gas > 1500) {
                 risk = 'CRITICAL';
                 color = '#ef4444';
                 icon = 'fa-fire';
-                reason = temp > 40 ? 'Extreme temperature detected.' : 'High gas levels detected.';
-            } else if (temp > 35 || (temp > 30 && hum < 30) || gas > 300) {
+                if (isFlame) reason = 'Optical flame detector triggered! Active flame present!';
+                else if (gas > 1500) reason = `Hazardous smoke/gas density (${gas} PPM) detected!`;
+                else reason = `Extreme temperature (${temp}°C) detected!`;
+            } else if (temp > 35 || gas > 400 || isIR || isAIFire) {
                 risk = 'HIGH';
                 color = '#f97316';
-                icon = 'fa-exclamation-triangle';
-                reason = 'Elevated temperature and dry conditions.';
-            } else if (temp > 30 || hum < 40 || gas > 200) {
+                icon = 'fa-triangle-exclamation';
+                reason = isAIFire ? 'AI model flagged active wildfire risk.' : 'Elevated smoke/gas or abnormal thermal readings.';
+            } else if (temp > 30 || hum < 35 || gas > 200) {
                 risk = 'MODERATE';
                 color = '#f59e0b';
-                icon = 'fa-exclamation-circle';
-                reason = 'Slightly abnormal readings. Monitoring.';
+                icon = 'fa-circle-exclamation';
+                reason = 'Moderate environmental dryness and elevated readings.';
             }
 
             return { risk, color, icon, reason };
         }
 
+        function updateFullUI(nodeData) {
+            if (!nodeData) return;
+            const sensors = nodeData.sensors || {};
+            const health = nodeData.health || {};
+
+            const temp = typeof sensors.temperature === 'number' ? sensors.temperature : 0;
+            const hum = typeof sensors.humidity === 'number' ? sensors.humidity : 0;
+            const gas = typeof sensors.mq === 'number' ? sensors.mq : 0;
+            const flame = typeof sensors.flame === 'number' ? sensors.flame : 0;
+            const ir = sensors.ir === true;
+            const aiPred = sensors.aiPrediction || 'none';
+            const aiConf = typeof sensors.aiConfidence === 'number' ? sensors.aiConfidence : 0;
+            const nodeStatus = sensors.status || (nodeData.online ? 'ONLINE' : 'OFFLINE');
+
+            // 1. Top Meta Strip
+            const elGateway = document.getElementById('metaGateway');
+            if (elGateway) elGateway.textContent = nodeData.gatewayId || 'GW-001';
+            
+            const elSignal = document.getElementById('metaSignal');
+            if (elSignal) elSignal.textContent = `${health.signalStrength || 0} dBm`;
+            
+            const elHops = document.getElementById('metaHops');
+            if (elHops) elHops.textContent = `${health.hops || 0} Hops`;
+            
+            const elGps = document.getElementById('metaGps');
+            if (elGps && nodeData.latitude && nodeData.longitude) {
+                elGps.textContent = `${Number(nodeData.latitude).toFixed(4)}, ${Number(nodeData.longitude).toFixed(4)}`;
+            }
+            
+            const metaBadge = document.getElementById('metaStatusBadge');
+            if (metaBadge) {
+                metaBadge.textContent = nodeStatus;
+                if (nodeStatus === 'HIGH' || nodeStatus === 'ALERT') {
+                    metaBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    metaBadge.style.color = '#fca5a5';
+                    metaBadge.style.borderColor = '#ef4444';
+                } else {
+                    metaBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    metaBadge.style.color = '#86efac';
+                    metaBadge.style.borderColor = '#22c55e';
+                }
+            }
+
+            // 2. 6-Sensor Telemetry Grid
+            // Temperature
+            const elTemp = document.getElementById('sensorTemp');
+            if (elTemp) elTemp.textContent = temp.toFixed(1) + '°C';
+            const tempBadge = document.getElementById('sensorTempBadge');
+            if (tempBadge) {
+                if (temp > 40) {
+                    tempBadge.textContent = 'CRITICAL';
+                    tempBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    tempBadge.style.color = '#fca5a5';
+                } else if (temp > 30) {
+                    tempBadge.textContent = 'ELEVATED';
+                    tempBadge.style.background = 'rgba(249, 115, 22, 0.2)';
+                    tempBadge.style.color = '#fdba74';
+                } else {
+                    tempBadge.textContent = 'NORMAL';
+                    tempBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    tempBadge.style.color = '#86efac';
+                }
+            }
+
+            // Humidity
+            const elHum = document.getElementById('sensorHum');
+            if (elHum) elHum.textContent = hum.toFixed(1) + '%';
+            const humBadge = document.getElementById('sensorHumBadge');
+            if (humBadge) {
+                humBadge.textContent = hum < 30 ? 'CRITICAL DRY' : hum < 45 ? 'DRY' : 'OPTIMAL';
+            }
+
+            // MQ2 Gas / Smoke
+            const elGas = document.getElementById('sensorGas');
+            if (elGas) elGas.textContent = gas;
+            const gasBadge = document.getElementById('sensorGasBadge');
+            if (gasBadge) {
+                if (gas > 1000) {
+                    gasBadge.textContent = 'DANGER';
+                    gasBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    gasBadge.style.color = '#fca5a5';
+                } else if (gas > 300) {
+                    gasBadge.textContent = 'HIGH ALERT';
+                    gasBadge.style.background = 'rgba(249, 115, 22, 0.2)';
+                    gasBadge.style.color = '#fdba74';
+                } else {
+                    gasBadge.textContent = 'NORMAL';
+                    gasBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    gasBadge.style.color = '#86efac';
+                }
+            }
+
+            // Flame Sensor
+            const flameValEl = document.getElementById('sensorFlame');
+            const flameBadge = document.getElementById('sensorFlameBadge');
+            if (flameValEl && flameBadge) {
+                if (flame > 0) {
+                    flameValEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-fire"></i> FLAME!</span>';
+                    flameBadge.textContent = 'DETECTED';
+                    flameBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    flameBadge.style.color = '#fca5a5';
+                } else {
+                    flameValEl.textContent = '0 (Safe)';
+                    flameBadge.textContent = 'SAFE';
+                    flameBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    flameBadge.style.color = '#86efac';
+                }
+            }
+
+            // IR Optical Sensor
+            const irValEl = document.getElementById('sensorIR');
+            const irBadge = document.getElementById('sensorIRBadge');
+            if (irValEl && irBadge) {
+                if (ir) {
+                    irValEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-radiation"></i> ACTIVE</span>';
+                    irBadge.textContent = 'SPIKE';
+                    irBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    irBadge.style.color = '#fca5a5';
+                } else {
+                    irValEl.textContent = 'CLEAR';
+                    irBadge.textContent = 'NORMAL';
+                    irBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    irBadge.style.color = '#86efac';
+                }
+            }
+
+            // AI Prediction
+            const aiValEl = document.getElementById('sensorAI');
+            const aiBadge = document.getElementById('sensorAIBadge');
+            if (aiValEl && aiBadge) {
+                aiValEl.textContent = `${aiPred.toUpperCase()} (${aiConf}%)`;
+                if (aiPred.toLowerCase().includes('fire')) {
+                    aiBadge.textContent = 'FIRE ALERT';
+                    aiBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    aiBadge.style.color = '#fca5a5';
+                } else {
+                    aiBadge.textContent = 'STANDBY';
+                    aiBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+                    aiBadge.style.color = '#c7d2fe';
+                }
+            }
+
+            // 3. Risk Assessment Box
+            const assessment = calculateRisk(temp, hum, gas, flame, ir, aiPred);
+            const riskDisplay = document.getElementById('riskLevelDisplay');
+            if (riskDisplay) {
+                riskDisplay.innerHTML = `<i class="fas ${assessment.icon}"></i> ${assessment.risk} RISK`;
+                riskDisplay.style.color = assessment.color;
+            }
+            const elReason = document.getElementById('riskReason');
+            if (elReason) elReason.textContent = assessment.reason;
+
+            // Update Threat Matrix
+            const mGas = document.getElementById('matrixGas');
+            if (mGas) mGas.textContent = `${gas} PPM ${gas > 300 ? '(Threshold Exceeded)' : '(Normal)'}`;
+            
+            const mTemp = document.getElementById('matrixTemp');
+            if (mTemp) mTemp.textContent = `${temp.toFixed(1)}°C ${temp > 35 ? '(Elevated)' : '(Normal)'}`;
+            
+            const mFlame = document.getElementById('matrixFlame');
+            if (mFlame) {
+                mFlame.textContent = flame > 0 ? 'FLAME DETECTED' : 'Clear (0)';
+                mFlame.style.color = flame > 0 ? '#ef4444' : '#10b981';
+            }
+            
+            const mAI = document.getElementById('matrixAI');
+            if (mAI) mAI.textContent = `${aiPred.toUpperCase()} (${aiConf}% Conf)`;
+
+            // 4. Hardware Health Details
+            const elSpecName = document.getElementById('specNodeName');
+            if (elSpecName) elSpecName.textContent = nodeData.name || activeNodeId;
+            
+            const elSpecId = document.getElementById('specNodeId');
+            if (elSpecId) elSpecId.textContent = nodeData.nodeId || activeNodeId;
+            
+            const elSpecGW = document.getElementById('specGateway');
+            if (elSpecGW) elSpecGW.textContent = nodeData.gatewayId || 'GW-001';
+            
+            const elSpecHops = document.getElementById('specHops');
+            if (elSpecHops) elSpecHops.textContent = `${health.hops || 0} Hops`;
+            
+            const elSpecSig = document.getElementById('specSignal');
+            if (elSpecSig) elSpecSig.textContent = `${health.signalStrength || 0} dBm`;
+            
+            const elSpecCoords = document.getElementById('specCoords');
+            if (elSpecCoords && nodeData.latitude && nodeData.longitude) {
+                elSpecCoords.textContent = `${Number(nodeData.latitude).toFixed(4)}, ${Number(nodeData.longitude).toFixed(4)}`;
+            }
+
+            // 5. Update Chart
+            if (sensorChart) {
+                const timeLabel = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                chartData.labels.push(timeLabel);
+                chartData.datasets[0].data.push(temp);
+                chartData.datasets[1].data.push(hum);
+                chartData.datasets[2].data.push(Math.round(gas / 25)); // Scaled for chart visibility
+                
+                if (chartData.labels.length > 20) {
+                    chartData.labels.shift();
+                    chartData.datasets[0].data.shift();
+                    chartData.datasets[1].data.shift();
+                    chartData.datasets[2].data.shift();
+                }
+                sensorChart.update();
+            }
+
+            // 6. Log entry
+            if (assessment.risk === 'CRITICAL' || assessment.risk === 'HIGH') {
+                addLogEntry(`[${activeNodeId}] ${assessment.risk} RISK: Temp ${temp}°C, Gas ${gas} PPM, Flame ${flame}`, 'alert');
+            } else {
+                addLogEntry(`[${activeNodeId}] Telemetry packet: Temp ${temp}°C, Hum ${hum}%, Gas ${gas}`, 'info');
+            }
+        }
+
         function setupSensorListener() {
             if (typeof firestore !== 'undefined') {
-                firestore.collection('nodes').doc('WF-003').onSnapshot(snapshot => {
-                    if (snapshot.exists) {
-                        const data = snapshot.data();
-                        updateSensorUI(data.sensors, data.name || data.nodeId || 'WF-003');
+                // Listen to ALL nodes in real-time
+                firestore.collection('nodes').onSnapshot(snapshot => {
+                    snapshot.forEach(doc => {
+                        allNodes[doc.id] = doc.data();
+                    });
+
+                    renderNodeTabs();
+
+                    // If active node exists in snapshot, update it
+                    if (allNodes[activeNodeId]) {
+                        updateFullUI(allNodes[activeNodeId]);
+                    } else if (snapshot.docs.length > 0) {
+                        activeNodeId = snapshot.docs[0].id;
+                        renderNodeTabs();
+                        updateFullUI(allNodes[activeNodeId]);
                     }
                 }, err => {
-                    console.error("Firestore error:", err);
-                    addLogEntry("Failed to connect to sensor data.", "alert");
+                    console.error("Firestore nodes listener error:", err);
+                    addLogEntry("Connection error with Firestore nodes collection", "alert");
                 });
             }
         }
 
-        function updateSensorUI(sensors, nodeName) {
-            if (!sensors) return;
-            const temp = sensors.temperature || 0;
-            const hum = sensors.humidity || 0;
-            const gas = sensors.mq || 0;
-            
-            document.getElementById('nodeNameLabel').textContent = `NODE: ${nodeName}`;
-
-            document.getElementById('sensorTemp').textContent = temp.toFixed(1) + '°C';
-            document.getElementById('sensorHum').textContent = hum.toFixed(1) + '%';
-            document.getElementById('sensorGas').textContent = gas;
-
-            const assessment = calculateRisk(temp, hum, gas);
-            
-            const riskDisplay = document.getElementById('riskLevelDisplay');
-            riskDisplay.innerHTML = `<i class="fas ${assessment.icon}"></i> ${assessment.risk} RISK`;
-            riskDisplay.style.color = assessment.color;
-            document.getElementById('riskReason').textContent = assessment.reason;
-
-            // Log if alert
-            if (sensors.status === 'HIGH' || assessment.risk === 'CRITICAL' || assessment.risk === 'HIGH') {
-                addLogEntry(`Node Alert: ${sensors.status || assessment.risk} | Temp: ${temp}°C | Gas: ${gas}`, 'alert');
+        function triggerEmergencySOS() {
+            if (typeof triggerEmergencyDispatch === 'function') {
+                triggerEmergencyDispatch();
             } else {
-                addLogEntry(`Telemetry updated. Temp: ${temp}°C, Hum: ${hum}%, Gas: ${gas}`, 'info');
+                const modal = document.getElementById('ambulanceDispatchModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    setTimeout(() => { document.getElementById('dispatchLog1').style.opacity = '1'; }, 500);
+                    setTimeout(() => { document.getElementById('dispatchLog2').style.opacity = '1'; }, 1500);
+                    setTimeout(() => { document.getElementById('dispatchLog3').style.opacity = '1'; }, 2500);
+                    setTimeout(() => { 
+                        document.getElementById('dispatchLog4').style.opacity = '1'; 
+                        document.getElementById('dispatchCloseBtn').style.display = 'block';
+                    }, 3500);
+                }
             }
+        }
 
-            // Update Chart
-            const timeLabel = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            chartData.labels.push(timeLabel);
-            chartData.datasets[0].data.push(temp);
-            chartData.datasets[1].data.push(hum);
-            
-            if (chartData.labels.length > 20) {
-                chartData.labels.shift();
-                chartData.datasets[0].data.shift();
-                chartData.datasets[1].data.shift();
-            }
-            
-            sensorChart.update();
+        function pingActiveNode() {
+            addLogEntry(`Transmitting LoRa PING packet to node ${activeNodeId} via gateway GW-001...`, 'info');
+            setTimeout(() => {
+                addLogEntry(`ACK received from ${activeNodeId} [Latency: 48ms, SNR: +9.2dB]`, 'info');
+            }, 600);
+        }
+
+        function closeDispatchModal() {
+            const modal = document.getElementById('ambulanceDispatchModal');
+            if (modal) modal.style.display = 'none';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
