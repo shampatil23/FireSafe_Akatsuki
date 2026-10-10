@@ -1,110 +1,113 @@
-# 🌲🔥 AgniVeer – AI-Powered Forest Fire Defence Ecosystem
+# 🌲🔥 FireSafe – Solar-Powered Long-Range Mesh Network for Forest Fire
 
-## 🚀 Project Overview
-We participated in the **Quantum Arena 1.0** under the theme **Smart City**.  
-Our team, **Team AgniVeer**, selected the problem statement:  
+![Platform Banner](https://github.com/user-attachments/assets/f1aee2a0-9965-493e-8dcd-643dafe09e5e)
 
-**“Beyond Prediction: An AI-powered Forest Fire Defence Ecosystem – from early detection to evacuation, response, and recovery.”**
-
-This project is designed to **predict, simulate, monitor, and assist evacuation** during forest fire disasters using AI, GIS maps, and real-time data visualization.
-
----
-
-## 👨‍💻 Team Information
-- **Team Lead**: Huzaifa Khan (Team AgniVeer)
-- Team Member: Sancheti Shinde
-- Team Member: Shreya Gawade
+We participated in the **Fusion** Hackathon under the **IOT-01 · IOT** track.  
+**Team Name**: Akatsuki  
+**Team ID**: FUS26-126  
+**Problem Statement**: Solar-Powered Long-Range Mesh Network for Forest Fire & Wildland Acoustic Infiltration  
 
 ---
 
-## 🌟 Platform Features
- <img width="1376" height="473" alt="image" src="https://github.com/user-attachments/assets/f1aee2a0-9965-493e-8dcd-643dafe09e5e" />
-
-
-### 🔥 Risk Analysis  
-- AI-powered fire risk prediction and assessment.  
-- Identifies vulnerable areas before fire escalation.
-  <img width="1355" height="842" alt="image" src="https://github.com/user-attachments/assets/00939780-7501-4926-9a14-4f99adf7c6c3" />
-
-### 🌲 Fire Simulation  
-- Interactive fire spread modeling and scenario testing.  
-- Helps authorities prepare for “what-if” conditions.
-  
-<img width="1528" height="870" alt="image" src="https://github.com/user-attachments/assets/0d72897b-5a8c-4c66-9c3f-b680b821500b" />
-<img width="1381" height="896" alt="image" src="https://github.com/user-attachments/assets/c2b8b30d-6dd9-4fc7-8389-2b205dff8616" />
-
-
-### ⚙️ Resource Management  
-- Optimal deployment of firefighting teams & equipment.  
-- Smart evacuation planning to minimize casualties.
-  <img width="1537" height="807" alt="image" src="https://github.com/user-attachments/assets/122bd8d2-e5fe-44cd-936a-0f4a15d8fede" />
-
-### Real-Time Evacuation Planning System
-  <img width="1419" height="846" alt="image" src="https://github.com/user-attachments/assets/9707f8da-8aed-44c8-8863-4cc88b49e1b6" />
-
-
-### 🔔 Monitoring & Alerts  
-- **Autonomous Citizen Alerts**: Instant SMS notifications sent to nearby users regarding escalating fire risks.
-- **Dynamic Evacuation**: AI-calculated safest routes providing GPS directions from a user's current location to the nearest safe zone based on real-time fire spread modeling.
-  <img width="1526" height="761" alt="image" src="https://github.com/user-attachments/assets/eef17dbd-a6d7-4b3c-87e8-8ef9f5a237e4" />
-
-
-### 🧊 3D/AR Visualization  
-- Immersive fire behavior visualization.  
-- Provides a clearer understanding of spread dynamics.
-  <img width="1336" height="817" alt="image" src="https://github.com/user-attachments/assets/f84779a3-21b8-4e32-b9a3-27aef40dfe05" />
-
-
-### 📊 Analytics & Reports  
-- Environmental impact insights & data-driven analysis.  
-- Helps in post-disaster evaluation and recovery planning.  
- <img width="1509" height="772" alt="image" src="https://github.com/user-attachments/assets/3d092b8e-2a09-410e-9d9d-b868201516be" />
- <img width="1522" height="806" alt="image" src="https://github.com/user-attachments/assets/9613f68a-eeea-4ea5-8e98-55bd4f3f4575" />
-
+## 🚀 Live Links
+- **Web Dashboard**: [https://firesafeakatsuki.vercel.app/](https://firesafeakatsuki.vercel.app/)
+- **Android App**: [Download FireSafe.apk](https://github.com/shampatil23/FireSafe_Akatsuki/releases/download/v1/FireSafe.apk)
 
 ---
 
-## 🖥️ Tech Stack
-- **Frontend**: HTML, CSS, JavaScript, Tailwind
-- **Backend**: Flask (Python), REST APIs
-- **Machine Learning**: Scikit-learn, Pandas, Numpy, SHAP, LIME
-- **Simulation**: Cellular Automata for fire spread
-- **Mapping APIs**: Google Maps API, OpenStreetMap
-- **Visualization**: Chart.js, D3.js, Leaflet.js
-- **Database**: Firebase / Firestore
+## 📖 Problem Statement Analysis
+Forest fires cause catastrophic damage to wildlife, ecosystems, and human settlements. Traditional monitoring systems suffer from significant drawbacks:
+- **Connectivity Issues**: Deep wildlands lack cellular networks, rendering standard IoT devices useless.
+- **Power Constraints**: Remote sensors quickly deplete batteries and cannot be manually serviced often.
+- **Late Detection**: Relying on satellite imagery or visual spotting often means fires are detected only after they have spread significantly.
+
+## 💡 Our Solution: FireSafe Ecosystem
+FireSafe is a comprehensive, end-to-end forest fire defense ecosystem designed to **predict, detect, alert, and manage** wildfires. 
+- **Solar-Powered Mesh Network**: Deploys low-power IoT nodes that communicate over long-range mesh networks (e.g., LoRaWAN) without cellular dependency.
+- **Acoustic & Environmental Infiltration**: Sensors capture temperature, humidity, gas levels, and acoustic anomalies to detect early signs of combustion.
+- **AI-Powered Risk Analysis**: Real-time telemetry is processed through our machine learning backend to predict fire risks and simulate spread patterns dynamically.
+- **Dual-Platform Dashboard**: A web-based command center for administrators/dispatchers and a mobile app for on-ground firefighters/citizens.
 
 ---
 
-## 📌 How It Works
-1. **Search any State/Region** → Displays real-time fire risk zones dynamically.  
-2. **Run Fire Simulation** → Shows spread of fire hour by hour under different wind conditions.  
-3. **Monitor Dashboard** → Provides alerts, live sensor data, and risk analytics.  
-4. **Evacuation Route Mapping** → Generates dynamic safe paths for nearby settlements.  
-5. **AI Explainability** → Justifies predictions for better trust & adoption.  
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph IoT Edge Network
+        Node1[Solar IoT Sensor Node]
+        Node2[Solar IoT Sensor Node]
+        Node3[Solar IoT Sensor Node]
+        Mesh[LoRaWAN Mesh Network]
+        Gateway[Central Gateway]
+    end
+
+    subgraph Cloud Infrastructure
+        Firebase[Firebase RTDB / Firestore]
+        ML[Machine Learning Engine]
+        Vercel[Vercel Hosted Web App]
+    end
+
+    subgraph End Users
+        Web[Web Command Center]
+        Mobile[Firefighter Mobile App]
+    end
+
+    Node1 --> Mesh
+    Node2 --> Mesh
+    Node3 --> Mesh
+    Mesh --> Gateway
+    Gateway --> Firebase
+    Firebase <--> ML
+    Firebase <--> Vercel
+    Vercel <--> Web
+    Firebase <--> Mobile
+```
 
 ---
 
-## 🖼️ Project Workflow
-1. **Input Layer** → Satellite Data + Weather Data + IoT Sensors (many more..)
-2. **AI Risk Prediction Model** → Classifies regions into Low/Medium/High risk  
-3. **Simulation Engine** → Predicts how fire will spread in future hours  
-4. **Evacuation Route Module** → Dynamic pathfinding with live fire spread updates  
-5. **Dashboard** → Citizens, Rangers, and Officials interact with real-time data  
+## 💻 Web Dashboard
+
+The web platform is designed as an Emergency Command Center for operators and administrators.
+
+### 1. 3D Forest Twin & Visualization
+Monitors live IoT nodes across the topography in a 3D digital twin. Allows operators to visually identify hotspots before they escalate.
+<img width="100%" alt="3D Visualization" src="https://github.com/user-attachments/assets/f84779a3-21b8-4e32-b9a3-27aef40dfe05" />
+
+### 2. Risk Analysis & Fire Simulation
+AI-powered predictions of fire spread based on current weather, wind speed, and fuel moisture. Helps authorities deploy resources effectively.
+<img width="100%" alt="Fire Simulation" src="https://github.com/user-attachments/assets/00939780-7501-4926-9a14-4f99adf7c6c3" />
+
+### 3. Resource Management & Evacuation
+Dynamic mapping of firefighting teams, vehicles, and real-time safe evacuation routes for citizens.
+<img width="100%" alt="Evacuation Planning" src="https://github.com/user-attachments/assets/9707f8da-8aed-44c8-8863-4cc88b49e1b6" />
+
+### 4. Operator Dispatch Desk
+A centralized hub where operators receive SOS alerts, view real-time sensor telemetry, and dispatch specific firefighters to critical areas based on location and severity.
+<img width="100%" alt="Operator Dashboard" src="https://github.com/user-attachments/assets/eef17dbd-a6d7-4b3c-87e8-8ef9f5a237e4" />
 
 ---
 
-## 🎯 Impact
-- Helps **save lives and wildlife** by enabling faster evacuation.  
-- Provides **scientifically explainable AI predictions** to decision-makers.  
-- Bridges the gap between **early detection and real-time ground action**.  
-- A **complete ecosystem** beyond prediction: *from detection → evacuation → response → recovery*.  
+## 📱 Mobile Application Dashboard
+
+The FireSafe Android app provides real-time situational awareness and communication for on-ground personnel and vulnerable citizens.
+
+<p align="center">
+  <img src="docs/mobile_dashboard1.png" width="45%" alt="Mobile Dashboard View 1"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/mobile_dashboard2.png" width="45%" alt="Mobile Dashboard View 2"/>
+</p>
+
+- **Real-time Telemetry:** Firefighters can view nearby sensor node data, air quality, and risk levels directly on their devices.
+- **SOS & Location Tracking:** Users can trigger instant SOS alerts which ping the operator command center with their exact GPS coordinates.
+- **Safe Routes:** Push notifications and dynamic mapping guide ground units and civilians to safety, avoiding active fire zones.
 
 ---
 
-## 📽️ Demo
-🔗 [Live Video Link](https://drive.google.com/file/d/1DLNkkMClP6y6Jpv4cx4_qNEsMJ7Wx1uj/view?usp=drive_link)  
+## 🛠️ Technology Stack
+- **Frontend**: HTML5, CSS3 (Glassmorphism), Vanilla JavaScript, Chart.js, Leaflet.js
+- **Backend & Realtime Data**: Firebase (Firestore, Realtime DB)
+- **Deployment**: Vercel (Web), GitHub Releases (APK)
+- **IoT Simulation**: Cellular Automata algorithms for spread prediction
 
 ---
----
-
-### 🔥 Team AgniVeer – Building AI for Safer Forests
