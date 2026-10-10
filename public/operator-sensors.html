@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Firebase SDKs (Compat version for simplicity in Vanilla JS prototype) -->
@@ -20,7 +22,10 @@
     <style>
         /* Specific Operator Dashboard Styles - Light Clean Theme */
         body {
-            /* Inherit color from styles.css */
+            font-family: 'Outfit', sans-serif;
+            background: #f8fafc; /* slightly lighter overall */
+            margin: 0;
+            color: #334155;
         }
         
         .main-wrapper {
@@ -28,7 +33,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background: #f1f5f9; /* Light grey background */
+            background: #f8fafc; 
         }
 
         .topbar {
@@ -82,8 +87,8 @@
         .sensor-container {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            padding: 20px 24px;
+            gap: 20px;
+            padding: 24px 30px;
             max-width: 1600px;
             margin: 0 auto;
             width: 100%;
@@ -151,22 +156,22 @@
         .telemetry-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             color: #334155;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.02);
         }
 
         .telemetry-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
             border-color: #cbd5e1;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
         }
 
         .telemetry-card .card-head {
@@ -195,17 +200,19 @@
         }
 
         .telemetry-card .card-value {
-            font-size: 1.85rem;
-            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.1rem;
+            font-weight: 800;
             color: #0f172a;
             line-height: 1.1;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
         }
 
         .telemetry-card .card-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #64748b;
             font-weight: 500;
+            letter-spacing: 0.2px;
         }
 
         .dashboard-split-row {
@@ -224,12 +231,12 @@
         .sensor-panel {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 14px;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             color: #334155;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.02);
         }
 
         .panel-header {
@@ -454,11 +461,11 @@
                         </div>
 
                         <!-- Big Risk Banner -->
-                        <div style="background: #fef2f2; border-radius: 12px; padding: 18px; border: 1px solid #fecaca; text-align: center; margin-bottom: 16px;">
-                            <div id="riskLevelDisplay" style="font-size: 2.2rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 12px; letter-spacing: -0.5px;">
-                                <i class="fas fa-fire"></i> CRITICAL RISK
+                        <div style="background: #f8fafc; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; text-align: center; margin-bottom: 20px;">
+                            <div id="riskLevelDisplay" style="font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 14px; letter-spacing: -0.5px; text-transform: uppercase;">
+                                <i class="fas fa-fire-flame-curved"></i> CRITICAL RISK
                             </div>
-                            <p id="riskReason" style="font-size: 0.92rem; color: #64748b; margin: 8px 0 0 0; line-height: 1.4;">
+                            <p id="riskReason" style="font-size: 0.95rem; color: #475569; margin: 12px 0 0 0; line-height: 1.5; font-weight: 500;">
                                 High gas and smoke concentration detected by node telemetry.
                             </p>
                         </div>
@@ -748,35 +755,55 @@
         }
 
         function calculateRisk(temp, hum, gas, flame, ir, aiPred) {
-            let risk = 'LOW';
+            let risk = 'SAFE';
             let color = '#10b981';
             let icon = 'fa-shield-halved';
-            let reason = 'All telemetry values within normal baseline.';
-
+            let reason = 'All sensors reporting within normal parameters.';
+            
             const isFlame = (flame > 0);
             const isIR = (ir === true);
             const isAIFire = (aiPred && aiPred.toLowerCase().includes('fire'));
 
-            if (isFlame || temp > 50 || gas > 1500) {
+            let severityScore = 0;
+            if (temp > 40) severityScore += 3;
+            else if (temp > 32) severityScore += 1;
+            
+            if (hum < 30) severityScore += 2;
+            else if (hum < 45) severityScore += 1;
+            
+            if (gas > 800) severityScore += 3;
+            else if (gas > 400) severityScore += 2;
+            else if (gas > 250) severityScore += 1;
+            
+            if (isIR) severityScore += 4;
+            if (isAIFire) severityScore += 4;
+            if (isFlame) severityScore += 10;
+
+            if (severityScore >= 8 || isFlame) {
                 risk = 'CRITICAL';
                 color = '#ef4444';
-                icon = 'fa-fire';
-                if (isFlame) reason = 'Optical flame detector triggered! Active flame present!';
-                else if (gas > 1500) reason = `Hazardous smoke/gas density (${gas} PPM) detected!`;
-                else reason = `Extreme temperature (${temp}°C) detected!`;
-            } else if (temp > 35 || gas > 400 || isIR || isAIFire) {
+                icon = 'fa-fire-flame-curved';
+                if (isFlame) reason = 'CRITICAL: Optical flame detector triggered! Active flame present!';
+                else if (isAIFire && gas > 800) reason = 'CRITICAL: AI confirmed fire with hazardous gas levels.';
+                else reason = `CRITICAL: Multiple severe environmental factors detected (Score: ${severityScore}).`;
+            } else if (severityScore >= 5) {
                 risk = 'HIGH';
                 color = '#f97316';
                 icon = 'fa-triangle-exclamation';
-                reason = isAIFire ? 'AI model flagged active wildfire risk.' : 'Elevated smoke/gas or abnormal thermal readings.';
-            } else if (temp > 30 || hum < 35 || gas > 200) {
-                risk = 'MODERATE';
+                reason = 'HIGH RISK: Elevated thermal and gas readings require immediate attention.';
+            } else if (severityScore >= 3) {
+                risk = 'ELEVATED';
                 color = '#f59e0b';
                 icon = 'fa-circle-exclamation';
-                reason = 'Moderate environmental dryness and elevated readings.';
+                reason = 'ELEVATED: Conditions are favorable for fire. Monitor closely.';
+            } else if (severityScore >= 1) {
+                risk = 'LOW';
+                color = '#3b82f6';
+                icon = 'fa-info-circle';
+                reason = 'LOW RISK: Slight deviations from baseline, generally safe.';
             }
 
-            return { risk, color, icon, reason };
+            return { risk, color, icon, reason, score: severityScore };
         }
 
         function updateFullUI(nodeData) {

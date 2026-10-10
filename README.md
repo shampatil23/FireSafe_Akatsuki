@@ -146,34 +146,34 @@ flowchart TB
 
 ## 📡 Physical Hardware Infrastructure
 
-The FireSafe edge nodes have been physically built and verified on breadboard prototypes for extreme outdoor resilience.
+The FireSafe edge nodes have been physically built and verified on breadboard prototypes for extreme outdoor resilience. This robust hardware architecture ensures maximum reliability in harsh forest conditions.
 
 <p align="center">
-  <img src="docs/hardware.png" alt="FireSafe Physical Hardware Architecture" width="90%" />
+  <img src="venv/reradmeassets/hardware.png" alt="FireSafe Physical Hardware Architecture" width="90%" style="border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" />
 </p>
 
-### 🔬 Node-by-Node Hardware Breakdown
+### 🔬 Node-by-Node Hardware Breakdown (Detailed Analysis)
 
-The physical prototype comprises three primary specialized nodes that establish the complete forest telemetry mesh:
+The physical prototype comprises three primary specialized nodes that establish the complete forest telemetry mesh. Each node is engineered for a specific role in the ecosystem, balancing power consumption with computational needs.
 
-#### 1. Node 1: Solar Autonomous Edge Sensing Unit
-* **Microcontroller**: ESP32 32-bit Dual-Core Tensilica Xtensa LX6 with ultra-low-power co-processor for deep-sleep duty cycles.
-* **Power Management Unit (BMS)**: 5V 1.5W Monocrystalline Photovoltaic Panel coupled with a TP4056 lithium battery charging module with dual overcharge/overdischarge protection.
-* **Energy Storage**: High-discharge 3.7V 2600mAh 18650 Li-ion rechargeable cell providing up to 14 days of dark operation.
-* **Acoustic Sensor**: High-sensitivity analog sound microphone module tuned for threshold detection of high-frequency chainsaw whines (1kHz-4kHz) and sharp combustion popping sounds.
-* **Environmental Sensor**: DHT11/DHT22 digital thermo-hygrometer measuring ambient temperature (-40°C to 80°C) and relative humidity (0% - 100%).
-* **RF Transceiver**: Semtech SX1278 LoRa 433MHz module with SPI interface, transmitting long-range chirp spread-spectrum packets.
+#### 1. Node 1: Solar Autonomous Edge Sensing Unit (The "Eyes & Ears")
+* **Microcontroller**: ESP32 32-bit Dual-Core Tensilica Xtensa LX6 with ultra-low-power co-processor for deep-sleep duty cycles. This allows the node to consume mere microamps while inactive.
+* **Power Management Unit (BMS)**: 5V 1.5W Monocrystalline Photovoltaic Panel coupled with a TP4056 lithium battery charging module. It features dual overcharge/overdischarge protection to ensure battery longevity in extreme temperatures.
+* **Energy Storage**: High-discharge 3.7V 2600mAh 18650 Li-ion rechargeable cell providing up to 14 days of dark operation (e.g., during heavy monsoon or winter cloud cover).
+* **Acoustic Sensor**: High-sensitivity analog sound microphone module tuned for threshold detection. The onboard DSP specifically isolates high-frequency chainsaw whines (1kHz-4kHz) and sharp combustion popping sounds, distinguishing them from normal wildlife noise.
+* **Environmental Sensor**: DHT11/DHT22 digital thermo-hygrometer measuring ambient temperature (-40°C to 80°C) and relative humidity (0% - 100%) to calculate local fuel dryness.
+* **RF Transceiver**: Semtech SX1278 LoRa 433MHz module with SPI interface. Utilizes chirp spread-spectrum modulation for exceptional signal penetration through dense forest canopies.
 
-#### 2. Node 2: Long-Range Mesh Repeater & Relay Unit
+#### 2. Node 2: Long-Range Mesh Repeater & Relay Unit (The "Backbone")
 * **Microcontroller**: ESP32 DevKit board running decentralized mesh routing firmware.
-* **Function**: Placed in high-elevation ridges to act as an autonomous packet repeater, bridging deep-valley sensor nodes with distant base gateways over terrain obstructions.
-* **Multi-Hop Protocol**: Automatically forwards packets containing sequence IDs and hop counts while discarding duplicate packets to prevent broadcast storms.
-* **Telemetry**: Integrated microclimate monitoring to calculate fire propagation risk along mountain slopes.
+* **Function**: Placed strategically on high-elevation ridges or fire-towers, acting as an autonomous packet repeater. It bridges deep-valley sensor nodes with distant base gateways, overcoming natural terrain obstructions.
+* **Multi-Hop Protocol**: Automatically forwards packets containing sequence IDs and hop counts. Employs collision avoidance and discards duplicate packets to prevent broadcast storms, ensuring efficient bandwidth utilization.
+* **Telemetry**: Integrated microclimate monitoring continuously calculates fire propagation risk vectors along mountain slopes.
 
-#### 3. Node 3: Base Gateway & Combustion Sniffer Unit
-* **Dual Radio Bridge**: ESP32 module operating simultaneously as a LoRa packet receiver on SPI and a Wi-Fi/GSM uplink station communicating with the Firebase cloud.
-* **Combustion Gas Sensor**: MQ-2 / MQ-135 semiconductor sensor sensitive to combustible gases (LPG, Propane), Carbon Monoxide (CO), and smoke aerosols.
-* **Packet Translation**: Demodulates incoming LoRa raw bytes, formats the payload into structured JSON, attaches gateway timestamps and RSSI metrics, and streams updates to Firebase Realtime Database.
+#### 3. Node 3: Base Gateway & Combustion Sniffer Unit (The "Brain")
+* **Dual Radio Bridge**: ESP32 module operating simultaneously as a LoRa packet receiver on the SPI bus and a Wi-Fi/GSM uplink station communicating securely with the Firebase cloud.
+* **Combustion Gas Sensor**: MQ-2 / MQ-135 semiconductor sensor highly sensitive to combustible gases (LPG, Propane), Carbon Monoxide (CO), and smoke aerosols. This detects smoldering ground fires before open flames appear.
+* **Packet Translation**: Demodulates incoming raw LoRa bytes, validates checksums, formats the payload into structured JSON, attaches gateway timestamps and RSSI metrics, and streams real-time updates to the Firebase Realtime Database.
 
 ### 📊 Hardware Specifications Matrix
 
@@ -242,13 +242,13 @@ The **FireSafe Android Application** provides critical on-ground coordination fo
 <table align="center" width="100%">
   <tr>
     <td align="center" width="50%">
-      <img src="docs/home.png" width="95%" alt="Mobile Home Screen" />
-      <br />
+      <img src="venv/reradmeassets/home.png" width="95%" alt="Mobile Home Screen" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+      <br /><br />
       <b>📱 Screen 1: Real-Time Threat Dashboard</b>
     </td>
     <td align="center" width="50%">
-      <img src="docs/map.png" width="95%" alt="Mobile Live Map Navigation" />
-      <br />
+      <img src="venv/reradmeassets/map.png" width="95%" alt="Mobile Live Map Navigation" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+      <br /><br />
       <b>🗺️ Screen 2: Dynamic Safe Evacuation Map</b>
     </td>
   </tr>
@@ -273,13 +273,13 @@ The **FireSafe Android Application** provides critical on-ground coordination fo
 <table align="center" width="100%">
   <tr>
     <td align="center" width="50%">
-      <img src="docs/report.png" width="95%" alt="Mobile Incident Reporting" />
-      <br />
+      <img src="venv/reradmeassets/report.png" width="95%" alt="Mobile Incident Reporting" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+      <br /><br />
       <b>📝 Screen 3: Acoustic & Infiltration Reporting</b>
     </td>
     <td align="center" width="50%">
-      <img src="docs/admin.png" width="95%" alt="Mobile Manager Command Desk" />
-      <br />
+      <img src="venv/reradmeassets/admin.png" width="95%" alt="Mobile Manager Command Desk" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+      <br /><br />
       <b>🛡️ Screen 4: Manager & Dispatch Console</b>
     </td>
   </tr>
@@ -302,7 +302,7 @@ The **FireSafe Android Application** provides critical on-ground coordination fo
 ### 🔴 Field Responder Experience: Firepolice Action Desk
 
 <p align="center">
-  <img src="docs/firepolice.png" width="45%" alt="Firepolice Dedicated Dashboard" />
+  <img src="venv/reradmeassets/firepolice.png" width="45%" alt="Firepolice Dedicated Dashboard" style="border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
 </p>
 
 * **Dedicated Officer View**: Streamlined interface for on-ground firefighters and police units.
