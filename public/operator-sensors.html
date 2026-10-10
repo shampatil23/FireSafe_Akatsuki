@@ -20,7 +20,7 @@
     <style>
         /* Specific Operator Dashboard Styles - Light Clean Theme */
         body {
-            color: white;
+            /* Inherit color from styles.css */
         }
         
         .main-wrapper {
@@ -28,13 +28,13 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background: var(--bg-dark, #0f172a); 
+            background: #f1f5f9; /* Light grey background */
         }
 
         .topbar {
             height: 70px;
-            background: rgba(30, 41, 59, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -45,14 +45,14 @@
         }
 
         .topbar .search-bar {
-            background: rgba(0, 0, 0, 0.2);
+            background: #f1f5f9;
             padding: 8px 15px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
             width: 300px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .topbar .search-bar i {
@@ -62,7 +62,7 @@
         .topbar .search-bar input {
             background: transparent;
             border: none;
-            color: white;
+            color: #334155;
             outline: none;
             width: 100%;
         }
@@ -71,44 +71,12 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            color: white;
+            color: #334155;
             font-weight: 500;
         }
 
         .topbar .user-profile .notifications i {
             color: #94a3b8;
-        }
-
-        .kpi-banner {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 20px 20px 0 20px;
-        }
-
-        .kpi-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            
-        }
-
-        .kpi-label {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .kpi-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
         }
 
         .sensor-container {
@@ -122,8 +90,8 @@
         }
 
         .sensor-topbar-strip {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 12px 20px;
             display: flex;
@@ -131,13 +99,13 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            backdrop-filter: blur(12px);
+            color: #334155;
         }
 
         .node-tab-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
             padding: 7px 15px;
             border-radius: 8px;
             font-size: 0.82rem;
@@ -150,16 +118,16 @@
         }
 
         .node-tab-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.2);
+            background: #e2e8f0;
+            color: #0f172a;
+            border-color: #cbd5e1;
         }
 
         .node-tab-btn.active {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(249, 115, 22, 0.2));
+            background: #ef4444; /* red as active tab */
             color: white;
             border-color: #ef4444;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
         }
 
         .sensor-grid-6 {
@@ -181,8 +149,8 @@
         }
 
         .telemetry-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 16px;
             display: flex;
@@ -190,13 +158,15 @@
             gap: 10px;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(8px);
             transition: transform 0.2s, border-color 0.2s;
+            color: #334155;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .telemetry-card:hover {
             transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .telemetry-card .card-head {
@@ -227,14 +197,14 @@
         .telemetry-card .card-value {
             font-size: 1.85rem;
             font-weight: 700;
-            color: white;
+            color: #0f172a;
             line-height: 1.1;
             letter-spacing: -0.5px;
         }
 
         .telemetry-card .card-label {
             font-size: 0.8rem;
-            color: #94a3b8;
+            color: #64748b;
             font-weight: 500;
         }
 
@@ -252,40 +222,25 @@
         }
 
         .sensor-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(8px);
+            color: #334155;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .panel-header {
             padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-        }
-
-        .incident-items {
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .incident-card {
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .incident-card:hover, .incident-card.selected {
-            background: var(--bg-dark, #0f172a);
+            color: #0f172a;
         }
 
         .severity-badge {
@@ -296,73 +251,13 @@
             text-transform: uppercase;
         }
 
-        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
-        .sev-high { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid #f97316; }
-        .sev-medium { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #eab308; }
-        .sev-low { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid #22c55e; }
-
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            background: var(--bg-dark, #0f172a);
-            color: #94a3b8;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .incident-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: #94a3b8;
-        }
-
-        .incident-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 1.05rem;
-            color: white;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-accept { background: #EF4444; color: white; }
-        .btn-accept:hover { background: #DC2626; }
-        
-        .btn-respond { background: #F97316; color: white; }
-        .btn-respond:hover { background: #EA580C; }
-        
-        .btn-resolve { background: #22C55E; color: white; }
-        .btn-resolve:hover { background: #16A34A; }
-
-        .btn-disabled { opacity: 0.5; pointer-events: none; }
-
         /* New Request Alert */
         .new-alert {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(30, 41, 59, 0.7);
-            color: white;
+            background: #ffffff;
+            color: #334155;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -370,8 +265,7 @@
             transform: translateX(120%);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-width: 350px;
-            border: 1px solid #FEE2E2;
-            
+            border: 1px solid #fecaca;
         }
 
         .new-alert h3 {
@@ -382,57 +276,6 @@
             transform: translateX(0);
         }
 
-        #operatorMap {
-            width: 100%;
-            height: 100%;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .detail-item span {
-            display: block;
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-        }
-        
-        .detail-item div {
-            font-weight: 500;
-            color: white;
-        }
-        
-        .op-notes {
-            margin-top: 15px;
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            resize: none;
-            height: 70px;
-            font-family: inherit;
-        }
-        
-        .op-notes:focus {
-            outline: none;
-            border-color: #EF4444;
-            background: rgba(30, 41, 59, 0.7);
-        }
-        
-        /* sidebar light overrides removed */
-        
-        
-        
-        
-        
-        
-        
     </style>
 </head>
 
@@ -494,9 +337,9 @@
             <!-- Top Controls Strip: Node Selector & Live Connectivity Specs -->
             <div class="sensor-topbar-strip">
                 <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 8px; padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; align-items: center; gap: 8px; padding-right: 12px; border-right: 1px solid #e2e8f0;">
                         <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite;"></span>
-                        <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">LORA MESH TELEMETRY</span>
+                        <span style="font-weight: 700; font-size: 0.95rem; color: #0f172a; letter-spacing: 0.3px;">LORA MESH TELEMETRY</span>
                     </div>
                     <!-- Node Switcher Tabs (WF-001, WF-002, WF-003) -->
                     <div id="nodeTabsContainer" style="display: flex; gap: 8px;">
@@ -513,11 +356,11 @@
                 </div>
 
                 <!-- Live Node Metadata Indicators -->
-                <div style="display: flex; align-items: center; gap: 18px; font-size: 0.82rem; color: #94a3b8; flex-wrap: wrap;">
-                    <div><i class="fas fa-tower-broadcast" style="color: #38bdf8; margin-right: 4px;"></i> Gateway: <strong id="metaGateway" style="color: #f1f5f9;">GW-001</strong></div>
-                    <div><i class="fas fa-signal" style="color: #10b981; margin-right: 4px;"></i> Signal: <strong id="metaSignal" style="color: #f1f5f9;">Optimal (0 dBm)</strong></div>
-                    <div><i class="fas fa-route" style="color: #a855f7; margin-right: 4px;"></i> Hops: <strong id="metaHops" style="color: #f1f5f9;">0 Hops (Direct)</strong></div>
-                    <div><i class="fas fa-location-dot" style="color: #f43f5e; margin-right: 4px;"></i> GPS: <strong id="metaGps" style="color: #f1f5f9;">18.4651, 73.8363</strong></div>
+                <div style="display: flex; align-items: center; gap: 18px; font-size: 0.82rem; color: #64748b; flex-wrap: wrap;">
+                    <div><i class="fas fa-tower-broadcast" style="color: #0ea5e9; margin-right: 4px;"></i> Gateway: <strong id="metaGateway" style="color: #0f172a;">GW-001</strong></div>
+                    <div><i class="fas fa-signal" style="color: #10b981; margin-right: 4px;"></i> Signal: <strong id="metaSignal" style="color: #0f172a;">Optimal (0 dBm)</strong></div>
+                    <div><i class="fas fa-route" style="color: #8b5cf6; margin-right: 4px;"></i> Hops: <strong id="metaHops" style="color: #0f172a;">0 Hops (Direct)</strong></div>
+                    <div><i class="fas fa-location-dot" style="color: #e11d48; margin-right: 4px;"></i> GPS: <strong id="metaGps" style="color: #0f172a;">18.4651, 73.8363</strong></div>
                     <div id="metaStatusBadge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;">HIGH ALERT</div>
                 </div>
             </div>
@@ -604,39 +447,39 @@
                     <!-- Real-Time Risk Assessment Card -->
                     <div class="sensor-panel" style="padding: 22px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
                                 <i class="fas fa-shield-halved" style="color: #ef4444; margin-right: 6px;"></i> Threat Assessment Engine
                             </h4>
-                            <span id="threatStatusText" style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 4px;">ACTIVE REAL-TIME</span>
+                            <span id="threatStatusText" style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: #dcfce7; padding: 2px 8px; border-radius: 4px;">ACTIVE REAL-TIME</span>
                         </div>
 
                         <!-- Big Risk Banner -->
-                        <div style="background: rgba(0, 0, 0, 0.25); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.05); text-align: center; margin-bottom: 16px;">
+                        <div style="background: #fef2f2; border-radius: 12px; padding: 18px; border: 1px solid #fecaca; text-align: center; margin-bottom: 16px;">
                             <div id="riskLevelDisplay" style="font-size: 2.2rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 12px; letter-spacing: -0.5px;">
                                 <i class="fas fa-fire"></i> CRITICAL RISK
                             </div>
-                            <p id="riskReason" style="font-size: 0.92rem; color: #cbd5e1; margin: 8px 0 0 0; line-height: 1.4;">
+                            <p id="riskReason" style="font-size: 0.92rem; color: #64748b; margin: 8px 0 0 0; line-height: 1.4;">
                                 High gas and smoke concentration detected by node telemetry.
                             </p>
                         </div>
 
                         <!-- Threat Diagnostics Matrix -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Smoke / Gas Level</span>
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Smoke / Gas Level</span>
                                 <strong id="matrixGas" style="color: #ef4444; font-size: 0.95rem;">1739 PPM (Threshold Exceeded)</strong>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Heat Index</span>
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Heat Index</span>
                                 <strong id="matrixTemp" style="color: #f59e0b; font-size: 0.95rem;">30.8°C (Elevated)</strong>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">Flame Optical</span>
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Flame Optical</span>
                                 <strong id="matrixFlame" style="color: #10b981; font-size: 0.95rem;">Clear (0)</strong>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                <span style="color: #94a3b8; display: block; margin-bottom: 3px;">AI Edge Model</span>
-                                <strong id="matrixAI" style="color: #818cf8; font-size: 0.95rem;">None (0% Conf)</strong>
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                                <span style="color: #64748b; display: block; margin-bottom: 3px;">AI Edge Model</span>
+                                <strong id="matrixAI" style="color: #6366f1; font-size: 0.95rem;">None (0% Conf)</strong>
                             </div>
                         </div>
 
@@ -645,7 +488,7 @@
                             <button onclick="triggerEmergencySOS()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.3);">
                                 <i class="fas fa-truck-medical"></i> Dispatch Unit
                             </button>
-                            <button onclick="pingActiveNode()" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <button onclick="pingActiveNode()" style="padding: 10px 16px; background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-rotate"></i> Ping Node
                             </button>
                         </div>
@@ -653,33 +496,33 @@
 
                     <!-- Hardware & Network Health Card -->
                     <div class="sensor-panel" style="padding: 18px 22px;">
-                        <h4 style="margin: 0 0 12px 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                            <i class="fas fa-network-wired" style="color: #38bdf8; margin-right: 6px;"></i> Node Architecture & Health
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            <i class="fas fa-network-wired" style="color: #0ea5e9; margin-right: 6px;"></i> Node Architecture & Health
                         </h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">Node Name:</span>
-                                <strong id="specNodeName" style="color: #f1f5f9;">Forest Node 003</strong>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">Node Name:</span>
+                                <strong id="specNodeName" style="color: #0f172a;">Forest Node 003</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">Hardware ID:</span>
-                                <strong id="specNodeId" style="color: #f1f5f9;">WF-003</strong>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">Hardware ID:</span>
+                                <strong id="specNodeId" style="color: #0f172a;">WF-003</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">LoRa Gateway:</span>
-                                <strong id="specGateway" style="color: #38bdf8;">GW-001</strong>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">LoRa Gateway:</span>
+                                <strong id="specGateway" style="color: #0ea5e9;">GW-001</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">Mesh Topology:</span>
-                                <strong id="specHops" style="color: #a855f7;">0 Hops (Direct)</strong>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">Mesh Topology:</span>
+                                <strong id="specHops" style="color: #8b5cf6;">0 Hops (Direct)</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">Signal Strength:</span>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">Signal Strength:</span>
                                 <strong id="specSignal" style="color: #10b981;">0 dBm</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <span style="color: #94a3b8;">Coordinates:</span>
-                                <strong id="specCoords" style="color: #f43f5e;">18.465, 73.836</strong>
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0;">
+                                <span style="color: #64748b;">Coordinates:</span>
+                                <strong id="specCoords" style="color: #e11d48;">18.465, 73.836</strong>
                             </div>
                         </div>
                     </div>
@@ -690,10 +533,10 @@
                     <!-- Telemetry Trends Multi-Sensor Chart -->
                     <div class="sensor-panel" style="padding: 18px 22px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
                                 <i class="fas fa-chart-line" style="color: #f59e0b; margin-right: 6px;"></i> Live Multi-Sensor Telemetry Trends
                             </h4>
-                            <div style="font-size: 0.75rem; color: #94a3b8;">
+                            <div style="font-size: 0.75rem; color: #64748b;">
                                 <i class="fas fa-circle" style="color: #22c55e; font-size: 0.5rem; margin-right: 4px;"></i> Live LoRa Stream
                             </div>
                         </div>
@@ -705,15 +548,15 @@
                     <!-- Real-Time Event & Telemetry Logs -->
                     <div class="sensor-panel" style="padding: 18px 22px; flex: 1;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <h4 style="margin: 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                                <i class="fas fa-terminal" style="color: #38bdf8; margin-right: 6px;"></i> Live Telemetry & Node Event Log
+                            <h4 style="margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="fas fa-terminal" style="color: #0ea5e9; margin-right: 6px;"></i> Live Telemetry & Node Event Log
                             </h4>
-                            <button onclick="clearLogs()" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
+                            <button onclick="clearLogs()" style="background: transparent; border: none; color: #3b82f6; font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
                                 Clear Console
                             </button>
                         </div>
-                        <div id="sensorLogs" style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px 16px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.82rem; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border: 1px solid rgba(255,255,255,0.04);">
-                            <div style="color: #94a3b8;">[BOOT] Telemetry subsystem initialized. Listening to LoRa Mesh...</div>
+                        <div id="sensorLogs" style="background: #f8fafc; border-radius: 8px; padding: 12px 16px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.82rem; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border: 1px solid #e2e8f0;">
+                            <div style="color: #64748b;">[BOOT] Telemetry subsystem initialized. Listening to LoRa Mesh...</div>
                         </div>
                     </div>
                 </div>
@@ -727,20 +570,20 @@
         <p style="margin-bottom: 5px;"><strong>Location:</strong> <span id="alertLoc"></span></p>
         <p style="margin-bottom: 15px;"><strong>Severity:</strong> <span id="alertSev" class="severity-badge"></span></p>
         <div style="display: flex; gap: 10px;">
-            <button onclick="dismissAlert()" style="flex:1; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(30, 41, 59, 0.7); color: #94a3b8; border-radius: 4px; cursor: pointer;">Dismiss</button>
+            <button onclick="dismissAlert()" style="flex:1; padding: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; border-radius: 4px; cursor: pointer;">Dismiss</button>
             <button onclick="viewLatestAlert()" style="flex:1; padding: 8px; border: none; background: #EF4444; color: white; font-weight: bold; border-radius: 4px; cursor: pointer;">View Incident</button>
         </div>
     </div>
 
     <!-- Auto-Simulation Modal using Iframe -->
-    <div id="autoSimModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
-        <div style="background: #1e293b; width: 95%; max-width: 1400px; height: 90vh; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-            <div style="padding: 15px 20px; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 10px;">
+    <div id="autoSimModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #ffffff; width: 95%; max-width: 1400px; height: 90vh; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div style="padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: #0f172a; margin: 0; display: flex; align-items: center; gap: 10px;">
                     <i class="fas fa-satellite-dish" style="color: #8B5CF6;"></i> 
                     Auto-Simulation: Real-Time Predictor
                 </h3>
-                <button onclick="closeAutoSimulation()" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 1.5rem;">&times;</button>
+                <button onclick="closeAutoSimulation()" style="background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 1.5rem;">&times;</button>
             </div>
             
             <iframe id="simIframe" src="" style="flex: 1; width: 100%; border: none;"></iframe>
@@ -748,15 +591,15 @@
     </div>
 
     <!-- Ambulance Dispatch Modal -->
-    <div id="ambulanceDispatchModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
-        <div style="background: #1e293b; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); text-align: center; padding: 40px 20px; position: relative;">
+    <div id="ambulanceDispatchModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div style="background: #ffffff; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); text-align: center; padding: 40px 20px; position: relative; border: 1px solid #e2e8f0;">
             <div id="dispatchIcon" style="font-size: 4rem; color: #F97316; margin-bottom: 20px; animation: pulse 1.5s infinite;">
                 <i class="fas fa-truck-medical"></i>
             </div>
-            <h2 id="dispatchTitle" style="color: white; margin-bottom: 15px; font-size: 1.5rem;">Initializing Dispatch...</h2>
+            <h2 id="dispatchTitle" style="color: #0f172a; margin-bottom: 15px; font-size: 1.5rem;">Initializing Dispatch...</h2>
             
-            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left;">
-                <div id="dispatchLog1" style="color: #94a3b8; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Scanning for nearby hospitals within 15km...</div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left;">
+                <div id="dispatchLog1" style="color: #64748b; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Scanning for nearby hospitals within 15km...</div>
                 <div id="dispatchLog2" style="color: #22C55E; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i> Matched with District General Hospital (4.2km away)</div>
                 <div id="dispatchLog3" style="color: #3B82F6; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-satellite-dish" style="margin-right: 8px;"></i> Transmitting SOS coordinates to Ambulance ALS-07...</div>
                 <div id="dispatchLog4" style="color: #F97316; font-weight: bold; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-truck-fast" style="margin-right: 8px;"></i> Ambulance En Route! ETA: 8 minutes.</div>
@@ -834,12 +677,12 @@
                     },
                     scales: {
                         x: {
-                            ticks: { color: '#94a3b8', maxTicksLimit: 8, font: { size: 10 } },
-                            grid: { color: 'rgba(255,255,255,0.04)' }
+                            ticks: { color: '#64748b', maxTicksLimit: 8, font: { size: 10 } },
+                            grid: { color: '#e2e8f0' }
                         },
                         y: {
-                            ticks: { color: '#94a3b8', font: { size: 10 } },
-                            grid: { color: 'rgba(255,255,255,0.04)' }
+                            ticks: { color: '#64748b', font: { size: 10 } },
+                            grid: { color: '#e2e8f0' }
                         }
                     }
                 }
