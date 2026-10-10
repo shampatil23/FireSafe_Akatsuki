@@ -93,14 +93,40 @@ A centralized hub where operators receive SOS alerts, view real-time sensor tele
 The FireSafe Android app provides real-time situational awareness and communication for on-ground personnel and vulnerable citizens.
 
 <p align="center">
-  <img src="docs/mobile_dashboard1.png" width="45%" alt="Mobile Dashboard View 1"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/mobile_dashboard2.png" width="45%" alt="Mobile Dashboard View 2"/>
+  <img src="docs/home.png" width="18%" alt="Home Dashboard"/>
+  <img src="docs/map.png" width="18%" alt="Live Map"/>
+  <img src="docs/report.png" width="18%" alt="Reporting"/>
+  <img src="docs/admin.png" width="18%" alt="Admin Tools"/>
+  <img src="docs/firepolice.png" width="18%" alt="Fire Police View"/>
 </p>
 
-- **Real-time Telemetry:** Firefighters can view nearby sensor node data, air quality, and risk levels directly on their devices.
-- **SOS & Location Tracking:** Users can trigger instant SOS alerts which ping the operator command center with their exact GPS coordinates.
-- **Safe Routes:** Push notifications and dynamic mapping guide ground units and civilians to safety, avoiding active fire zones.
+- **Home & Telemetry:** Firefighters can view nearby sensor node data, air quality, and risk levels directly on their devices.
+- **Live Map Tracking:** Users and officials can track incidents and view safe evacuation routes.
+- **Incident Reporting:** On-ground teams can report fire incidents and status back to the main command center.
+- **Admin & Command Tools:** Manage emergency resources and dispatch personnel dynamically based on role.
+- **Role-Based Access (Fire Police):** Tailored dashboards and features specific to law enforcement and firefighting units.
+
+---
+
+## 📡 Hardware Infrastructure
+
+The backbone of the FireSafe system is the remote IoT sensor mesh. These nodes are designed to survive and operate continuously in deep wildland environments.
+
+<p align="center">
+  <img src="docs/hardware.png" width="80%" alt="IoT Hardware Node Components"/>
+</p>
+
+### Key Hardware Components:
+1. **Solar Power & Power Management (BMS)**
+   - Equipped with solar panels and high-capacity Li-ion batteries, allowing nodes to operate indefinitely without grid power or manual battery replacements.
+2. **LoRaWAN Mesh Transmitter**
+   - Transmits telemetry data over long distances (up to 15km) without relying on cellular network coverage. Multiple nodes form a mesh to relay data to a central gateway.
+3. **Microcontroller Unit (MCU)**
+   - An energy-efficient microcontroller (e.g., ESP32) processes sensor inputs locally to minimize transmission bandwidth and power.
+4. **Environmental & Acoustic Sensors**
+   - **Temperature & Humidity:** Detects dry, arid conditions that increase fire risk.
+   - **Gas Sensors (CO/Smoke):** Detects early combustion products before flames are visible.
+   - **Acoustic Sensor:** Constantly monitors audio frequencies to detect anomalies like the crackling of fire or the sound of chainsaws (illegal logging).
 
 ---
 
