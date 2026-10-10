@@ -922,15 +922,42 @@
         }
 
         function setupSensorListener() {
-            if (typeof db !== 'undefined') {
-                // Listen to ALL nodes in real-time from the Realtime Database
+            if (typeof firestore !== 'undefined' && firestore) {
+                // Listen to ALL nodes in real-time from Firestore
+                firestore.collection('nodes').onSnapshot(snapshot => {
+                    const data = {};
+                    snapshot.forEach(doc => {
+                        data[doc.id] = doc.data();
+                    });
+                    
+                    if (Object.keys(data).length > 0) {
+                        allNodes = data;
+                        renderNodeTabs();
+
+                        // If active node exists in snapshot, update it
+                        if (allNodes[activeNodeId]) {
+                            updateFullUI(allNodes[activeNodeId]);
+                        } else {
+                            const keys = Object.keys(allNodes);
+                            if (keys.length > 0) {
+                                activeNodeId = keys[0];
+                                renderNodeTabs();
+                                updateFullUI(allNodes[activeNodeId]);
+                            }
+                        }
+                    }
+                }, err => {
+                    console.error("Firestore nodes listener error:", err);
+                    addLogEntry("Connection error with Firestore nodes", "alert");
+                });
+            } else if (typeof db !== 'undefined') {
+                // Fallback to RTDB if Firestore is somehow unavailable
                 db.ref('nodes').on('value', snapshot => {
                     const data = snapshot.val();
                     if (data) {
                         allNodes = data;
                         renderNodeTabs();
 
-                        // If active node exists in snapshot, update it
                         if (allNodes[activeNodeId]) {
                             updateFullUI(allNodes[activeNodeId]);
                         } else {
