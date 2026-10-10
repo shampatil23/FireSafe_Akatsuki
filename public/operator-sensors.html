@@ -720,27 +720,40 @@
 
         function updateFullUI(nodeData) {
             if (!nodeData) return;
-            const sensors = nodeData.sensors || {};
+            const sensors = nodeData.sensors || nodeData.sensorReadings || {};
             const health = nodeData.health || {};
 
             const temp = typeof sensors.temperature === 'number' ? sensors.temperature : 0;
             const hum = typeof sensors.humidity === 'number' ? sensors.humidity : 0;
-            const gas = typeof sensors.mq === 'number' ? sensors.mq : 0;
+            const gas = typeof sensors.mq === 'number' ? sensors.mq : (typeof sensors.smoke === 'number' ? sensors.smoke : (sensors.smoke === 'High' ? 800 : (sensors.smoke === 'Low' ? 200 : 0)));
             const flame = typeof sensors.flame === 'number' ? sensors.flame : 0;
             const ir = sensors.ir === true;
             const aiPred = sensors.aiPrediction || 'none';
             const aiConf = typeof sensors.aiConfidence === 'number' ? sensors.aiConfidence : 0;
-            const nodeStatus = sensors.status || (nodeData.online ? 'ONLINE' : 'OFFLINE');
+            
+            let nodeStatus = sensors.status;
+            if (!nodeStatus) {
+                if (nodeData.online === true || (nodeData.lastHeartbeatAt && Date.now() - nodeData.lastHeartbeatAt < 600000)) {
+                    nodeStatus = 'ONLINE';
+                } else if (nodeData.online === false) {
+                    nodeStatus = 'OFFLINE';
+                } else {
+                    nodeStatus = 'ONLINE'; // Assume online for simulated if recent
+                }
+            }
+
+            const signalStr = health.signalStrength !== undefined ? health.signalStrength : (nodeData.signalStrength !== undefined ? nodeData.signalStrength : 0);
+            const nodeHops = health.hops !== undefined ? health.hops : (nodeData.hops !== undefined ? nodeData.hops : 0);
 
             // 1. Top Meta Strip
             const elGateway = document.getElementById('metaGateway');
             if (elGateway) elGateway.textContent = nodeData.gatewayId || 'GW-001';
             
             const elSignal = document.getElementById('metaSignal');
-            if (elSignal) elSignal.textContent = `${health.signalStrength || 0} dBm`;
+            if (elSignal) elSignal.textContent = `${signalStr} dBm`;
             
             const elHops = document.getElementById('metaHops');
-            if (elHops) elHops.textContent = `${health.hops || 0} Hops`;
+            if (elHops) elHops.textContent = `${nodeHops} Hops`;
             
             const elGps = document.getElementById('metaGps');
             if (elGps && nodeData.latitude && nodeData.longitude) {
@@ -873,10 +886,10 @@
             if (elSpecGW) elSpecGW.textContent = nodeData.gatewayId || 'GW-001';
             
             const elSpecHops = document.getElementById('specHops');
-            if (elSpecHops) elSpecHops.textContent = `${health.hops || 0} Hops`;
+            if (elSpecHops) elSpecHops.textContent = `${nodeHops} Hops`;
             
             const elSpecSig = document.getElementById('specSignal');
-            if (elSpecSig) elSpecSig.textContent = `${health.signalStrength || 0} dBm`;
+            if (elSpecSig) elSpecSig.textContent = `${signalStr} dBm`;
             
             const elSpecCoords = document.getElementById('specCoords');
             if (elSpecCoords && nodeData.latitude && nodeData.longitude) {
@@ -901,8 +914,8 @@
             }
 
             // 6. Log entry
-            if (assessment.risk === 'CRITICAL' || assessment.risk === 'HIGH') {
-                addLogEntry(`[${activeNodeId}] ${assessment.risk} RISK: Temp ${temp}°C, Gas ${gas} PPM, Flame ${flame}`, 'alert');
+            if (temp > 40 || gas > 800 || flame > 0) {
+                addLogEntry(`[${activeNodeId}] CRITICAL ALERT: Temp ${temp}°C, Gas ${gas} PPM, Flame ${flame}`, 'alert');
             } else {
                 addLogEntry(`[${activeNodeId}] Telemetry packet: Temp ${temp}°C, Hum ${hum}%, Gas ${gas}`, 'info');
             }
