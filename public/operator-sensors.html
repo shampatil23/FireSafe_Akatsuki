@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgniVeer - Firefighter Operator Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Compat version for simplicity in Vanilla JS prototype) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* Specific Operator Dashboard Styles - Light Clean Theme */
+        body {
+            color: white;
+        }
+        
+        .main-wrapper {
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-dark, #0f172a); 
+        }
+
+        .topbar {
+            height: 70px;
+            background: rgba(30, 41, 59, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar .search-bar {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .topbar .search-bar i {
+            color: #94a3b8;
+        }
+
+        .topbar .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+        }
+
+        .topbar .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .topbar .user-profile .notifications i {
+            color: #94a3b8;
+        }
+
+        .kpi-banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px 20px 0 20px;
+        }
+
+        .kpi-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .sensor-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sensor-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .incident-items {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .incident-card {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .incident-card:hover, .incident-card.selected {
+            background: var(--bg-dark, #0f172a);
+        }
+
+        .severity-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+        .sev-high { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid #f97316; }
+        .sev-medium { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #eab308; }
+        .sev-low { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid #22c55e; }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--bg-dark, #0f172a);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .incident-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .incident-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-accept { background: #EF4444; color: white; }
+        .btn-accept:hover { background: #DC2626; }
+        
+        .btn-respond { background: #F97316; color: white; }
+        .btn-respond:hover { background: #EA580C; }
+        
+        .btn-resolve { background: #22C55E; color: white; }
+        .btn-resolve:hover { background: #16A34A; }
+
+        .btn-disabled { opacity: 0.5; pointer-events: none; }
+
+        /* New Request Alert */
+        .new-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 350px;
+            border: 1px solid #FEE2E2;
+            
+        }
+
+        .new-alert h3 {
+            color: #EF4444;
+        }
+
+        .new-alert.show {
+            transform: translateX(0);
+        }
+
+        #operatorMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item span {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item div {
+            font-weight: 500;
+            color: white;
+        }
+        
+        .op-notes {
+            margin-top: 15px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            height: 70px;
+            font-family: inherit;
+        }
+        
+        .op-notes:focus {
+            outline: none;
+            border-color: #EF4444;
+            background: rgba(30, 41, 59, 0.7);
+        }
+        
+        /* sidebar light overrides removed */
+        
+        
+        
+        
+        
+        
+        
+    </style>
+</head>
+
+<body>
+    <!-- Hidden audio element for alerts (Internal Local File) -->
+    <audio id="alertSound" src="./alarm.wav" preload="auto"></audio>
+    
+    <!-- Sidebar (Reused from existing) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="brand">
+                    <i class="fas fa-fire-extinguisher" style="color: #ef4444;"></i>
+                    Operator
+                </div>
+                <div class="sidebar-tagline">Emergency Command Center</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Operations</div>
+                <a href="operator.html" class="sidebar-nav-link">
+                    <i class="fas fa-headset"></i>
+                    <span>Dispatcher Desk</span>
+                </a>
+                <a href="operator-sensors.html" class="sidebar-nav-link active">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>Sensor Readings</span>
+                </a>
+                <a href="#" onclick="localStorage.removeItem('agniVeerToken'); localStorage.removeItem('agniVeerRole'); window.location.href='login.html';" class="sidebar-nav-link" style="margin-top: 20px; color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Change Role</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Incident ID...">
+            </div>
+            <div class="user-profile" style="display: flex; gap: 20px; align-items: center;">
+                <button id="enableSoundBtn" onclick="unlockAudio()" style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3B82F6; color: #60A5FA; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <i class="fas fa-bell-slash"></i> Enable Sound Alerts
+                </button>
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="alertBadge">0</span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Fire+Operator&background=ef4444&color=fff" alt="Profile" class="avatar">
+                <span>Station Commander</span>
+            </div>
+        </header>
+
+        <div class="sensor-container">
+            <!-- Sensor Panel -->
+            <div class="sensor-panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-satellite-dish"></i> Live Field Sensors</span>
+                </div>
+                <div class="sensor-content" style="padding: 20px; display: flex; flex-direction: column; gap: 20px; flex: 1;">
+                    <div>
+                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
+                        <div style="display: flex; gap: 15px;">
+                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                <i class="fas fa-thermometer-half" style="color: #ef4444; margin-bottom: 10px; font-size: 2rem;"></i>
+                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorTemp">--°C</div>
+                                <div style="font-size: 0.9rem; color: #94a3b8;">Temperature</div>
+                            </div>
+                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                <i class="fas fa-tint" style="color: #3b82f6; margin-bottom: 10px; font-size: 2rem;"></i>
+                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorHum">--%</div>
+                                <div style="font-size: 0.9rem; color: #94a3b8;">Humidity</div>
+                            </div>
+                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                <i class="fas fa-wind" style="color: #f59e0b; margin-bottom: 10px; font-size: 2rem;"></i>
+                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorGas">--</div>
+                                <div style="font-size: 0.9rem; color: #94a3b8;">MQ2 Gas / Smoke</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Real-time Risk Assessment</h4>
+                        <div id="riskLevelDisplay" style="font-size: 2.5rem; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-shield-alt"></i> LOW RISK
+                        </div>
+                        <p id="riskReason" style="font-size: 1rem; color: #94a3b8; margin-top: 10px;">Awaiting sensor data...</p>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <canvas id="sensorChart" height="250"></canvas>
+                    </div>
+
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Recent Logs</h4>
+                        <div id="sensorLogs" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.9rem; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 150px;">
+                            <div style="color: #94a3b8;">System initialized. Waiting for telemetry...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Alert Popup -->
+    <div class="new-alert" id="newAlertPopup">
+        <h3 style="margin-bottom: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> NEW EMERGENCY</h3>
+        <p style="margin-bottom: 5px;"><strong>Location:</strong> <span id="alertLoc"></span></p>
+        <p style="margin-bottom: 15px;"><strong>Severity:</strong> <span id="alertSev" class="severity-badge"></span></p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="dismissAlert()" style="flex:1; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(30, 41, 59, 0.7); color: #94a3b8; border-radius: 4px; cursor: pointer;">Dismiss</button>
+            <button onclick="viewLatestAlert()" style="flex:1; padding: 8px; border: none; background: #EF4444; color: white; font-weight: bold; border-radius: 4px; cursor: pointer;">View Incident</button>
+        </div>
+    </div>
+
+    <!-- Auto-Simulation Modal using Iframe -->
+    <div id="autoSimModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #1e293b; width: 95%; max-width: 1400px; height: 90vh; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            <div style="padding: 15px 20px; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-satellite-dish" style="color: #8B5CF6;"></i> 
+                    Auto-Simulation: Real-Time Predictor
+                </h3>
+                <button onclick="closeAutoSimulation()" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 1.5rem;">&times;</button>
+            </div>
+            
+            <iframe id="simIframe" src="" style="flex: 1; width: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <!-- Ambulance Dispatch Modal -->
+    <div id="ambulanceDispatchModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div style="background: #1e293b; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.3); text-align: center; padding: 40px 20px; position: relative;">
+            <div id="dispatchIcon" style="font-size: 4rem; color: #F97316; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+                <i class="fas fa-truck-medical"></i>
+            </div>
+            <h2 id="dispatchTitle" style="color: white; margin-bottom: 15px; font-size: 1.5rem;">Initializing Dispatch...</h2>
+            
+            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left;">
+                <div id="dispatchLog1" style="color: #94a3b8; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Scanning for nearby hospitals within 15km...</div>
+                <div id="dispatchLog2" style="color: #22C55E; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-check-circle" style="margin-right: 8px;"></i> Matched with District General Hospital (4.2km away)</div>
+                <div id="dispatchLog3" style="color: #3B82F6; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-satellite-dish" style="margin-right: 8px;"></i> Transmitting SOS coordinates to Ambulance ALS-07...</div>
+                <div id="dispatchLog4" style="color: #F97316; font-weight: bold; opacity: 0; transition: opacity 0.3s;"><i class="fas fa-truck-fast" style="margin-right: 8px;"></i> Ambulance En Route! ETA: 8 minutes.</div>
+            </div>
+            
+            <button id="dispatchCloseBtn" onclick="closeDispatchModal()" style="display: none; width: 100%; padding: 12px; border: none; background: #3B82F6; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s;">Acknowledge & Close</button>
+        </div>
+    </div>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Load Firebase Config First -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        // ------------------ SENSOR DASHBOARD LOGIC ------------------
+        let sensorChart;
+        const chartData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Temperature (°C)',
+                    data: [],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Humidity (%)',
+                    data: [],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        };
+
+        function initChart() {
+            const ctx = document.getElementById('sensorChart').getContext('2d');
+            sensorChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { size: 12 } } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8', maxTicksLimit: 10, font: { size: 11 } },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8', font: { size: 12 } },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function addLogEntry(message, type = 'info') {
+            const logsContainer = document.getElementById('sensorLogs');
+            const color = type === 'alert' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#94a3b8';
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            
+            const logEl = document.createElement('div');
+            logEl.style.color = color;
+            logEl.innerHTML = `<span style="opacity:0.7">[${time}]</span> ${message}`;
+            
+            logsContainer.insertBefore(logEl, logsContainer.firstChild);
+            
+            // keep only last 50
+            if (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.lastChild);
+            }
+        }
+
+        function calculateRisk(temp, hum, gas) {
+            let risk = 'LOW';
+            let color = '#10b981';
+            let icon = 'fa-shield-alt';
+            let reason = 'Normal conditions.';
+
+            if (temp > 40 || gas > 400) {
+                risk = 'CRITICAL';
+                color = '#ef4444';
+                icon = 'fa-fire';
+                reason = temp > 40 ? 'Extreme temperature detected.' : 'High gas levels detected.';
+            } else if (temp > 35 || (temp > 30 && hum < 30) || gas > 300) {
+                risk = 'HIGH';
+                color = '#f97316';
+                icon = 'fa-exclamation-triangle';
+                reason = 'Elevated temperature and dry conditions.';
+            } else if (temp > 30 || hum < 40 || gas > 200) {
+                risk = 'MODERATE';
+                color = '#f59e0b';
+                icon = 'fa-exclamation-circle';
+                reason = 'Slightly abnormal readings. Monitoring.';
+            }
+
+            return { risk, color, icon, reason };
+        }
+
+        function setupSensorListener() {
+            if (typeof firestore !== 'undefined') {
+                firestore.collection('sensorReadings').orderBy('timestamp', 'desc').limit(1).onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const data = snapshot.docs[0].data();
+                        updateSensorUI(data);
+                    }
+                }, err => {
+                    console.error("Firestore error:", err);
+                    addLogEntry("Failed to connect to sensor data.", "alert");
+                });
+            }
+        }
+
+        function updateSensorUI(data) {
+            const temp = data.temperatureC || 0;
+            const hum = data.humidityPercent || 0;
+            const gas = data.mq2Raw || 0;
+            
+            document.getElementById('sensorTemp').textContent = temp.toFixed(1) + '°C';
+            document.getElementById('sensorHum').textContent = hum.toFixed(1) + '%';
+            document.getElementById('sensorGas').textContent = gas;
+
+            const assessment = calculateRisk(temp, hum, gas);
+            
+            const riskDisplay = document.getElementById('riskLevelDisplay');
+            riskDisplay.innerHTML = `<i class="fas ${assessment.icon}"></i> ${assessment.risk} RISK`;
+            riskDisplay.style.color = assessment.color;
+            document.getElementById('riskReason').textContent = assessment.reason;
+
+            // Log if alert
+            if (data.status === 'ALERT' || data.temperatureAlert || data.mq2Alert) {
+                addLogEntry(`Node Alert: ${data.status} | Temp: ${temp}°C`, 'alert');
+            } else {
+                addLogEntry(`Telemetry updated. Temp: ${temp}°C, Hum: ${hum}%`, 'info');
+            }
+
+            // Update Chart
+            const timeLabel = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            chartData.labels.push(timeLabel);
+            chartData.datasets[0].data.push(temp);
+            chartData.datasets[1].data.push(hum);
+            
+            if (chartData.labels.length > 20) {
+                chartData.labels.shift();
+                chartData.datasets[0].data.shift();
+                chartData.datasets[1].data.shift();
+            }
+            
+            sensorChart.update();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            setupSensorListener();
+        });
+    </script>
+</body>
+</html>
