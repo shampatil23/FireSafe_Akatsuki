@@ -116,7 +116,7 @@
             flex-direction: column;
             gap: 20px;
             padding: 20px;
-            max-width: 1200px;
+            max-width: 95%;
             margin: 0 auto;
         }
 
@@ -367,7 +367,7 @@
                 </div>
                 <div class="sensor-content" style="padding: 20px; display: flex; flex-direction: column; gap: 20px; flex: 1;">
                     <div>
-                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
+                        <h4 id="nodeNameLabel" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
                         <div style="display: flex; gap: 15px;">
                             <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
                                 <i class="fas fa-thermometer-half" style="color: #ef4444; margin-bottom: 10px; font-size: 2rem;"></i>
@@ -565,10 +565,10 @@
 
         function setupSensorListener() {
             if (typeof firestore !== 'undefined') {
-                firestore.collection('sensorReadings').orderBy('timestamp', 'desc').limit(1).onSnapshot(snapshot => {
-                    if (!snapshot.empty) {
-                        const data = snapshot.docs[0].data();
-                        updateSensorUI(data);
+                firestore.collection('nodes').doc('WF-003').onSnapshot(snapshot => {
+                    if (snapshot.exists) {
+                        const data = snapshot.data();
+                        updateSensorUI(data.sensors, data.name || data.nodeId || 'WF-003');
                     }
                 }, err => {
                     console.error("Firestore error:", err);
@@ -577,11 +577,14 @@
             }
         }
 
-        function updateSensorUI(data) {
-            const temp = data.temperatureC || 0;
-            const hum = data.humidityPercent || 0;
-            const gas = data.mq2Raw || 0;
+        function updateSensorUI(sensors, nodeName) {
+            if (!sensors) return;
+            const temp = sensors.temperature || 0;
+            const hum = sensors.humidity || 0;
+            const gas = sensors.mq || 0;
             
+            document.getElementById('nodeNameLabel').textContent = `NODE: ${nodeName}`;
+
             document.getElementById('sensorTemp').textContent = temp.toFixed(1) + '°C';
             document.getElementById('sensorHum').textContent = hum.toFixed(1) + '%';
             document.getElementById('sensorGas').textContent = gas;
@@ -594,10 +597,10 @@
             document.getElementById('riskReason').textContent = assessment.reason;
 
             // Log if alert
-            if (data.status === 'ALERT' || data.temperatureAlert || data.mq2Alert) {
-                addLogEntry(`Node Alert: ${data.status} | Temp: ${temp}°C`, 'alert');
+            if (sensors.status === 'HIGH' || assessment.risk === 'CRITICAL' || assessment.risk === 'HIGH') {
+                addLogEntry(`Node Alert: ${sensors.status || assessment.risk} | Temp: ${temp}°C | Gas: ${gas}`, 'alert');
             } else {
-                addLogEntry(`Telemetry updated. Temp: ${temp}°C, Hum: ${hum}%`, 'info');
+                addLogEntry(`Telemetry updated. Temp: ${temp}°C, Hum: ${hum}%, Gas: ${gas}`, 'info');
             }
 
             // Update Chart
