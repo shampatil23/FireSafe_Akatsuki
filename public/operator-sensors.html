@@ -365,46 +365,56 @@
                 <div class="panel-header">
                     <span><i class="fas fa-satellite-dish"></i> Live Field Sensors</span>
                 </div>
-                <div class="sensor-content" style="padding: 20px; display: flex; flex-direction: column; gap: 20px; flex: 1;">
-                    <div>
-                        <h4 id="nodeNameLabel" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
-                        <div style="display: flex; gap: 15px;">
-                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                <i class="fas fa-thermometer-half" style="color: #ef4444; margin-bottom: 10px; font-size: 2rem;"></i>
-                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorTemp">--°C</div>
-                                <div style="font-size: 0.9rem; color: #94a3b8;">Temperature</div>
+                <div class="sensor-content" style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; align-items: stretch;">
+                    
+                    <!-- Left Column -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4 id="nodeNameLabel" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Node: GRIDGUARD_ESP32_01</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                    <i class="fas fa-thermometer-half" style="color: #ef4444; margin-bottom: 10px; font-size: 2rem;"></i>
+                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorTemp">--°C</div>
+                                    <div style="font-size: 0.9rem; color: #94a3b8;">Temperature</div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                    <i class="fas fa-tint" style="color: #3b82f6; margin-bottom: 10px; font-size: 2rem;"></i>
+                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorHum">--%</div>
+                                    <div style="font-size: 0.9rem; color: #94a3b8;">Humidity</div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                                    <i class="fas fa-wind" style="color: #f59e0b; margin-bottom: 10px; font-size: 2rem;"></i>
+                                    <div style="font-size: 2.2rem; font-weight: 700;" id="sensorGas">--</div>
+                                    <div style="font-size: 0.9rem; color: #94a3b8;">MQ2 Gas / Smoke</div>
+                                </div>
                             </div>
-                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                <i class="fas fa-tint" style="color: #3b82f6; margin-bottom: 10px; font-size: 2rem;"></i>
-                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorHum">--%</div>
-                                <div style="font-size: 0.9rem; color: #94a3b8;">Humidity</div>
+                        </div>
+
+                        <div style="padding: 30px 20px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; text-transform: uppercase;">Real-time Risk Assessment</h4>
+                            <div id="riskLevelDisplay" style="font-size: 3rem; font-weight: 700; color: #10b981; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                                <i class="fas fa-shield-alt" style="font-size: 4rem;"></i>
+                                <span>LOW RISK</span>
                             </div>
-                            <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
-                                <i class="fas fa-wind" style="color: #f59e0b; margin-bottom: 10px; font-size: 2rem;"></i>
-                                <div style="font-size: 2.2rem; font-weight: 700;" id="sensorGas">--</div>
-                                <div style="font-size: 0.9rem; color: #94a3b8;">MQ2 Gas / Smoke</div>
+                            <p id="riskReason" style="font-size: 1.1rem; color: #94a3b8; margin-top: 20px;">Awaiting sensor data...</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Telemetry Trends</h4>
+                            <canvas id="sensorChart" height="250"></canvas>
+                        </div>
+
+                        <div style="flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Recent Logs</h4>
+                            <div id="sensorLogs" style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 15px; font-family: monospace; font-size: 0.9rem; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 150px; max-height: 250px;">
+                                <div style="color: #94a3b8;">System initialized. Waiting for telemetry...</div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Real-time Risk Assessment</h4>
-                        <div id="riskLevelDisplay" style="font-size: 2.5rem; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 15px;">
-                            <i class="fas fa-shield-alt"></i> LOW RISK
-                        </div>
-                        <p id="riskReason" style="font-size: 1rem; color: #94a3b8; margin-top: 10px;">Awaiting sensor data...</p>
-                    </div>
-
-                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <canvas id="sensorChart" height="250"></canvas>
-                    </div>
-
-                    <div style="flex: 1; display: flex; flex-direction: column;">
-                        <h4 style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">Recent Logs</h4>
-                        <div id="sensorLogs" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.9rem; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 150px;">
-                            <div style="color: #94a3b8;">System initialized. Waiting for telemetry...</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
