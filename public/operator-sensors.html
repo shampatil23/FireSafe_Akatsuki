@@ -451,46 +451,8 @@
             <div class="dashboard-split-row">
                 <!-- Left Column: Risk Engine & Node Specs -->
                 <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <!-- Real-Time Risk Assessment Card -->
-                    <div class="sensor-panel" style="padding: 22px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <h4 style="margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                                <i class="fas fa-shield-halved" style="color: #ef4444; margin-right: 6px;"></i> Threat Assessment Engine
-                            </h4>
-                            <span id="threatStatusText" style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: #dcfce7; padding: 2px 8px; border-radius: 4px;">ACTIVE REAL-TIME</span>
-                        </div>
-
-                        <!-- Big Risk Banner -->
-                        <div style="background: #f8fafc; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; text-align: center; margin-bottom: 20px;">
-                            <div id="riskLevelDisplay" style="font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 14px; letter-spacing: -0.5px; text-transform: uppercase;">
-                                <i class="fas fa-fire-flame-curved"></i> CRITICAL RISK
-                            </div>
-                            <p id="riskReason" style="font-size: 0.95rem; color: #475569; margin: 12px 0 0 0; line-height: 1.5; font-weight: 500;">
-                                High gas and smoke concentration detected by node telemetry.
-                            </p>
-                        </div>
-
-                        <!-- Threat Diagnostics Matrix -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Smoke / Gas Level</span>
-                                <strong id="matrixGas" style="color: #ef4444; font-size: 0.95rem;">1739 PPM (Threshold Exceeded)</strong>
-                            </div>
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Heat Index</span>
-                                <strong id="matrixTemp" style="color: #f59e0b; font-size: 0.95rem;">30.8°C (Elevated)</strong>
-                            </div>
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                                <span style="color: #64748b; display: block; margin-bottom: 3px;">Flame Optical</span>
-                                <strong id="matrixFlame" style="color: #10b981; font-size: 0.95rem;">Clear (0)</strong>
-                            </div>
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                                <span style="color: #64748b; display: block; margin-bottom: 3px;">AI Edge Model</span>
-                                <strong id="matrixAI" style="color: #6366f1; font-size: 0.95rem;">None (0% Conf)</strong>
-                            </div>
-                        </div>
-
-                        <!-- Action Triggers -->
+                    <!-- Action Triggers -->
+                    <div class="sensor-panel" style="padding: 18px 22px;">
                         <div style="display: flex; gap: 10px;">
                             <button onclick="triggerEmergencySOS()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.3);">
                                 <i class="fas fa-truck-medical"></i> Dispatch Unit
@@ -754,57 +716,7 @@
             }).join('');
         }
 
-        function calculateRisk(temp, hum, gas, flame, ir, aiPred) {
-            let risk = 'SAFE';
-            let color = '#10b981';
-            let icon = 'fa-shield-halved';
-            let reason = 'All sensors reporting within normal parameters.';
-            
-            const isFlame = (flame > 0);
-            const isIR = (ir === true);
-            const isAIFire = (aiPred && aiPred.toLowerCase().includes('fire'));
 
-            let severityScore = 0;
-            if (temp > 40) severityScore += 3;
-            else if (temp > 32) severityScore += 1;
-            
-            if (hum < 30) severityScore += 2;
-            else if (hum < 45) severityScore += 1;
-            
-            if (gas > 800) severityScore += 3;
-            else if (gas > 400) severityScore += 2;
-            else if (gas > 250) severityScore += 1;
-            
-            if (isIR) severityScore += 4;
-            if (isAIFire) severityScore += 4;
-            if (isFlame) severityScore += 10;
-
-            if (severityScore >= 8 || isFlame) {
-                risk = 'CRITICAL';
-                color = '#ef4444';
-                icon = 'fa-fire-flame-curved';
-                if (isFlame) reason = 'CRITICAL: Optical flame detector triggered! Active flame present!';
-                else if (isAIFire && gas > 800) reason = 'CRITICAL: AI confirmed fire with hazardous gas levels.';
-                else reason = `CRITICAL: Multiple severe environmental factors detected (Score: ${severityScore}).`;
-            } else if (severityScore >= 5) {
-                risk = 'HIGH';
-                color = '#f97316';
-                icon = 'fa-triangle-exclamation';
-                reason = 'HIGH RISK: Elevated thermal and gas readings require immediate attention.';
-            } else if (severityScore >= 3) {
-                risk = 'ELEVATED';
-                color = '#f59e0b';
-                icon = 'fa-circle-exclamation';
-                reason = 'ELEVATED: Conditions are favorable for fire. Monitor closely.';
-            } else if (severityScore >= 1) {
-                risk = 'LOW';
-                color = '#3b82f6';
-                icon = 'fa-info-circle';
-                reason = 'LOW RISK: Slight deviations from baseline, generally safe.';
-            }
-
-            return { risk, color, icon, reason, score: severityScore };
-        }
 
         function updateFullUI(nodeData) {
             if (!nodeData) return;
@@ -948,31 +860,7 @@
                 }
             }
 
-            // 3. Risk Assessment Box
-            const assessment = calculateRisk(temp, hum, gas, flame, ir, aiPred);
-            const riskDisplay = document.getElementById('riskLevelDisplay');
-            if (riskDisplay) {
-                riskDisplay.innerHTML = `<i class="fas ${assessment.icon}"></i> ${assessment.risk} RISK`;
-                riskDisplay.style.color = assessment.color;
-            }
-            const elReason = document.getElementById('riskReason');
-            if (elReason) elReason.textContent = assessment.reason;
 
-            // Update Threat Matrix
-            const mGas = document.getElementById('matrixGas');
-            if (mGas) mGas.textContent = `${gas} PPM ${gas > 300 ? '(Threshold Exceeded)' : '(Normal)'}`;
-            
-            const mTemp = document.getElementById('matrixTemp');
-            if (mTemp) mTemp.textContent = `${temp.toFixed(1)}°C ${temp > 35 ? '(Elevated)' : '(Normal)'}`;
-            
-            const mFlame = document.getElementById('matrixFlame');
-            if (mFlame) {
-                mFlame.textContent = flame > 0 ? 'FLAME DETECTED' : 'Clear (0)';
-                mFlame.style.color = flame > 0 ? '#ef4444' : '#10b981';
-            }
-            
-            const mAI = document.getElementById('matrixAI');
-            if (mAI) mAI.textContent = `${aiPred.toUpperCase()} (${aiConf}% Conf)`;
 
             // 4. Hardware Health Details
             const elSpecName = document.getElementById('specNodeName');
